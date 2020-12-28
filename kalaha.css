@@ -88,13 +88,13 @@ main {
 
 .active {
     box-shadow: 4px 4px 20px rgba(41, 44, 51, 0.5);
-    background: linear-gradient(-45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.06) 30%,
-        rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.05));
+    background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
+        rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03));
 }
 
 .house.active:hover {
     cursor: pointer;
-    box-shadow: 5px 5px 25px rgba(41, 44, 51, 0.8);
+    box-shadow: 5px 5px 25px rgba(41, 44, 51, 0.6);
 }
 
 .stone {
