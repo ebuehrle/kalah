@@ -88,33 +88,27 @@ main {
 }
 
 .red {
-    /* background-color: rgb(209, 114, 119); */
-    background: radial-gradient(rgb(207, 136, 139), rgb(209, 114, 119))
+    background-color: rgb(209, 114, 119);
 }
 
 .green {
-    /* background-color: rgb(161, 194, 129); */
-    background: radial-gradient(rgb(187, 192, 181), rgb(161, 194, 129));
+    background-color: rgb(161, 194, 129);
 }
 
 .yellow {
-    /* background-color: rgb(223, 192, 132); */
-    background: radial-gradient(rgb(219, 213, 199), rgb(223, 192, 132));
+    background-color: rgb(223, 192, 132);
 }
 
 .blue {
-    /*background-color: rgb(116, 173, 233);*/
-    background: radial-gradient(rgb(182, 207, 235), rgb(116, 173, 233));
+    background-color: rgb(116, 173, 233);
 }
 
 .purple {
-    /* background-color: rgb(188, 124, 215); */
-    background: radial-gradient(rgb(201, 178, 211), rgb(188, 124, 215));
+    background-color: rgb(188, 124, 215);
 }
 
 .cyan {
-    /* background-color: rgb(112, 180, 192); */
-    background: radial-gradient(rgb(167, 184, 187), rgb(112, 180, 192));
+    background-color: rgb(112, 180, 192);
 }
 
 .message {
