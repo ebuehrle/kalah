@@ -65,7 +65,6 @@ main {
 
 .house,
 .store {
-    /*border: 1px solid rgb(222, 223, 227);*/
     border-radius: 15px;
     padding: 10px;
 
@@ -73,7 +72,13 @@ main {
     transition-duration: 0.5s;
     transition-timing-function: ease;
     box-shadow: 1px 1px 5px rgba(41, 44, 51, 0.4);
+}
 
+.store {
+    grid-row: 1/3;
+}
+
+.glass {
     /*background: linear-gradient(-45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 27%,
     rgba(255, 255, 255, 0.15) 30%, rgba(255, 255, 255, 0.15) 36%, rgba(255, 255, 255, 0.05) 40%, rgba(255, 255, 255, 0.05) 67%,
     rgba(255, 255, 255, 0.15) 70%, rgba(255, 255, 255, 0.05));*/
@@ -82,12 +87,11 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.store {
-    grid-row: 1/3;
-}
-
 .active {
     box-shadow: 4px 4px 20px rgba(41, 44, 51, 0.5);
+}
+
+.glass.active {
     background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
         rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03));
 }
@@ -149,16 +153,19 @@ main {
 
 .message .refresh {
     padding: 1em;
-    color: rgb(222, 223, 227);
-    border: 1px solid rgb(222, 223, 227);
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
     background-color: transparent;
+    
     transition: box-shadow 0.5s ease;
     cursor: pointer;
 }
 
 .message .refresh:hover {
-    box-shadow: 2px 2px 10px rgba(41, 44, 51, 0.5);
+    box-shadow: 2px 2px 20px rgba(41, 44, 51, 0.5);
+    background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
+        rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03));
 }
 
 #store0 {
