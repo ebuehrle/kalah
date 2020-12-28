@@ -17,7 +17,8 @@ body {
 }
 
 header {
-    margin: 4em;
+    margin-top: 3.5em;
+    margin-bottom: 2.5em;
     text-align: center;
 }
 
@@ -30,13 +31,14 @@ main {
 }
 
 .player-names {
-    margin: 0 2em 2em 2em;
+    margin: 2em 0;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
 .player-name {
+    margin: 0 1em;
     font-size: 1.5em;
 }
 
