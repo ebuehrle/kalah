@@ -2,11 +2,18 @@
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100%;
+}
+
 body {
-    background-color: rgb(41, 44, 51);
-    color: rgb(222, 223, 227);
+    background: linear-gradient(80deg, #d53369 0%, #da9f47 100%);
+    /* background-color: rgb(41, 44, 51); */
+    /*min-height: 100%;*/
     font-family: 'Roboto', sans-serif;
     font-weight: 100;
+    color: rgb(222, 223, 227);
+    text-shadow: 2px 2px 10px rgb(41, 44, 51);
 }
 
 header {
@@ -48,10 +55,10 @@ main {
 .store {
     border: 1px solid rgb(222, 223, 227);
     border-radius: 15px;
-
     padding: 10px;
 
-    transition: border-color 0.5s ease;
+    transition: box-shadow 0.5s ease;
+    box-shadow: 1px 1px 5px rgba(41, 44, 51, 0.4);
 }
 
 .store {
@@ -59,7 +66,8 @@ main {
 }
 
 .active {
-    border-color: rgb(116, 173, 233);
+    /* border-color: rgb(116, 173, 233); */
+    box-shadow: 4px 4px 20px rgba(41, 44, 51, 0.7);
 }
 
 .stone {
@@ -76,30 +84,37 @@ main {
     transition-property: top, left;
     transition-duration: 0.5s;
     transition-timing-function: ease;
+    box-shadow: 2px 2px 10px rgba(41, 44, 51, 0.5);
 }
 
 .red {
-    background-color: rgb(209, 114, 119);
+    /* background-color: rgb(209, 114, 119); */
+    background: radial-gradient(rgb(207, 136, 139), rgb(209, 114, 119))
 }
 
 .green {
-    background-color: rgb(161, 194, 129);
+    /* background-color: rgb(161, 194, 129); */
+    background: radial-gradient(rgb(187, 192, 181), rgb(161, 194, 129));
 }
 
 .yellow {
-    background-color: rgb(223, 192, 132);
+    /* background-color: rgb(223, 192, 132); */
+    background: radial-gradient(rgb(219, 213, 199), rgb(223, 192, 132));
 }
 
 .blue {
-    background-color: rgb(116, 173, 233);
+    /*background-color: rgb(116, 173, 233);*/
+    background: radial-gradient(rgb(182, 207, 235), rgb(116, 173, 233));
 }
 
 .purple {
-    background-color: rgb(188, 124, 215);
+    /* background-color: rgb(188, 124, 215); */
+    background: radial-gradient(rgb(201, 178, 211), rgb(188, 124, 215));
 }
 
 .cyan {
-    background-color: rgb(112, 180, 192);
+    /* background-color: rgb(112, 180, 192); */
+    background: radial-gradient(rgb(167, 184, 187), rgb(112, 180, 192));
 }
 
 .message {
@@ -113,6 +128,16 @@ main {
 
 .message .refresh {
     padding: 1em;
+    color: rgb(222, 223, 227);
+    border: 1px solid rgb(222, 223, 227);
+    border-radius: 10px;
+    background-color: transparent;
+    transition: box-shadow 0.5s ease;
+    cursor: pointer;
+}
+
+.message .refresh:hover {
+    box-shadow: 2px 2px 10px rgba(41, 44, 51, 0.5);
 }
 
 #store0 {
