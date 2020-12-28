@@ -33,6 +33,7 @@ h1 {
     position: relative;
     top: 0.2em;
     z-index: 0;
+    text-shadow: 2px 2px 15px rgb(41, 44, 51);
 }
 
 main {
