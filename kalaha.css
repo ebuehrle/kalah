@@ -8,8 +8,6 @@ html {
 
 body {
     background: linear-gradient(80deg, #d53369 0%, #da9f47 100%);
-    /* background-color: rgb(41, 44, 51); */
-    /*min-height: 100%;*/
     font-family: 'Roboto', sans-serif;
     font-weight: 100;
     color: rgb(222, 223, 227);
@@ -68,7 +66,6 @@ main {
 }
 
 .active {
-    /* border-color: rgb(116, 173, 233); */
     box-shadow: 4px 4px 20px rgba(41, 44, 51, 0.7);
 }
 
