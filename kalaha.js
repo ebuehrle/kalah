@@ -20,6 +20,8 @@ realStones.forEach(s => s.classList.add([
 const stoneViews = realStones.map((realStone, i) => new StoneView(dummyStones[i], realStone));
 let boardView = new BoardView(stoneViews, houses, stores);
 
+window.addEventListener('resize', () => boardView.render());
+
 resetGame();
 
 houses.forEach((houseView, slotIdx) => {
