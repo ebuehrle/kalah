@@ -22,25 +22,41 @@ let boardView = new BoardView(stoneViews, houses, stores);
 
 window.addEventListener('resize', () => boardView.render());
 
+function setPlayer(player) {
+    boardView.setPlayer(player);
+    messageText.innerHTML = `${player ? p1Name.innerHTML : p0Name.innerHTML}, your turn.`
+}
+
+function resetGame(board=new Board(), player=0) {
+    gameState = {
+        board: board,
+        player: player,
+    };
+    setPlayer(gameState.player);
+    boardView.render(gameState.board.state);
+}
+
 resetGame();
+history.pushState(gameState, document.title);
 
 houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
-        const moveResult = board.move(slotIdx, player);
+        const moveResult = gameState.board.move(slotIdx, gameState.player);
         if (moveResult === null) {
             return; // invalid move
         }
 
         const [boardDistribute, boardPickup] = moveResult;
         boardView.render(boardDistribute.state).then(() => boardView.render(boardPickup.state));
-        board = boardPickup;
 
-        player = (player + 1) % 2;
-        setPlayer(player);
+        gameState.board = boardPickup;
+        gameState.player = (gameState.player + 1) % 2;
+        history.pushState(gameState, document.title);
+        setPlayer(gameState.player);
 
-        if (!board.canMove(player)) {
-            const p0Score = board.playerScore(0);
-            const p1Score = board.playerScore(1);
+        if (!gameState.board.canMove(gameState.player)) {
+            const p0Score = gameState.board.playerScore(0);
+            const p1Score = gameState.board.playerScore(1);
             if (p0Score > p1Score) {
                 messageText.innerHTML = `${p0Name.innerHTML} wins with ${p0Score} &mdash; ${p1Score}.`;
             } else if (p1Score > p0Score) {
@@ -54,16 +70,9 @@ houses.forEach((houseView, slotIdx) => {
 
 document.querySelector('button.refresh').addEventListener('click', () => {
     resetGame();
+    history.pushState(gameState, document.title);
 });
 
-function resetGame() {
-    board = new Board();
-    boardView.render(board.state);
-    player = 0;
-    setPlayer(player);
-}
-
-function setPlayer(player) {
-    boardView.setPlayer(player);
-    messageText.innerHTML = `${player ? p1Name.innerHTML : p0Name.innerHTML}, your turn.`
-}
+window.addEventListener('popstate', ev => {
+    resetGame(new Board(ev.state.board.state), ev.state.player);
+});
