@@ -73,29 +73,22 @@ class BoardView {
         });
     }
 
-    setPlayer(player) {
+    activePlayer(player) {
+        const player0Store = this.stores[0];
+        const player1Store = this.stores[1];
+        const player0Houses = [0, 1, 2, 3, 4, 5].map(i => this.houses[i]);
+        const player1Houses = [6, 7, 8, 9, 10, 11].map(i => this.houses[i]);
+
         if (player === 0) {
-            [
-                this.stores[0],
-                this.houses[3], this.houses[4], this.houses[5],
-                this.houses[6], this.houses[7], this.houses[8],
-            ].forEach(e => e.classList.add('active'));
-            [
-                this.stores[1],
-                this.houses[0], this.houses[1], this.houses[2],
-                this.houses[9], this.houses[10], this.houses[11],
-            ].forEach(e => e.classList.remove('active'));
+            player0Store.classList.add('active');
+            player0Houses.forEach(h => h.classList.add('active'));
+            player1Store.classList.remove('active');
+            player1Houses.forEach(h => h.classList.remove('active'));
         } else {
-            [
-                this.stores[0],
-                this.houses[3], this.houses[4], this.houses[5],
-                this.houses[6], this.houses[7], this.houses[8],
-            ].forEach(e => e.classList.remove('active'));
-            [
-                this.stores[1],
-                this.houses[0], this.houses[1], this.houses[2],
-                this.houses[9], this.houses[10], this.houses[11],
-            ].forEach(e => e.classList.add('active'));
+            player1Store.classList.add('active');
+            player1Houses.forEach(h => h.classList.add('active'));
+            player0Store.classList.remove('active');
+            player0Houses.forEach(h => h.classList.remove('active'));
         }
     }
 }

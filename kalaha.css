@@ -173,60 +173,60 @@ main {
 
 #h0 {
     grid-row: 2;
-    grid-column: 7;
+    grid-column: 4;
 }
 
 #h1 {
     grid-row: 2;
-    grid-column: 6;
+    grid-column: 3;
 }
 
 #h2 {
     grid-row: 2;
-    grid-column: 5;
+    grid-column: 2;
 }
 
 #h3 {
-    grid-row: 2;
-    grid-column: 4;
+    grid-row: 1;
+    grid-column: 2;
 }
 
 #h4 {
-    grid-row: 2;
+    grid-row: 1;
     grid-column: 3;
 }
 
 #h5 {
-    grid-row: 2;
-    grid-column: 2;
-}
-
-#h6 {
-    grid-row: 1;
-    grid-column: 2;
-}
-
-#h7 {
-    grid-row: 1;
-    grid-column: 3;
-}
-
-#h8 {
     grid-row: 1;
     grid-column: 4;
 }
 
-#h9 {
+#h6 {
     grid-row: 1;
     grid-column: 5;
 }
 
-#h10 {
+#h7 {
     grid-row: 1;
     grid-column: 6;
 }
 
-#h11 {
+#h8 {
     grid-row: 1;
     grid-column: 7;
+}
+
+#h9 {
+    grid-row: 2;
+    grid-column: 7;
+}
+
+#h10 {
+    grid-row: 2;
+    grid-column: 6;
+}
+
+#h11 {
+    grid-row: 2;
+    grid-column: 5;
 }

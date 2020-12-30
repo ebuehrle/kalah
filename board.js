@@ -23,17 +23,20 @@ class Board {
         const endHouse = house % 12;
         const prevHouse = (endHouse + 11) % 12;
         const nextHouse = (endHouse + 1) % 12;
-        const adjHouse = (11 - endHouse) % 12;
+        const adjHouse = (17 - endHouse) % 12;
 
         const endStones = newState[endHouse];
         const prevStones = newState[prevHouse];
         const nextStones = newState[nextHouse];
         const adjStones = newState[adjHouse];
 
-        newState[12 + player] += ((2 <= endStones && endStones <= 3) ? newState.splice(endHouse, 1, 0)[0] : 0);
-        newState[12 + player] += ((2 <= prevStones && prevStones <= 3) ? newState.splice(prevHouse, 1, 0)[0] : 0);
-        newState[12 + player] += ((2 <= nextStones && nextStones <= 3) ? newState.splice(nextHouse, 1, 0)[0] : 0);
-        newState[12 + player] += ((2 <= adjStones && adjStones <= 3) ? newState.splice(adjHouse, 1, 0)[0] : 0);
+        const playerStore = 12 + player;
+        const canPickup = stones => (2 <= stones && stones <= 3);
+
+        newState[playerStore] += (canPickup(endStones) ? newState.splice(endHouse, 1, 0)[0] : 0);
+        newState[playerStore] += (canPickup(prevStones) ? newState.splice(prevHouse, 1, 0)[0] : 0);
+        newState[playerStore] += (canPickup(nextStones) ? newState.splice(nextHouse, 1, 0)[0] : 0);
+        newState[playerStore] += (canPickup(adjStones) ? newState.splice(adjHouse, 1, 0)[0] : 0);
 
         const statePickup = newState.slice();
 
@@ -42,8 +45,8 @@ class Board {
 
     moveValid(player, house) {
         const validHouses = [
-            [3, 4, 5, 6, 7, 8],
-            [0, 1, 2, 9, 10, 11],
+            [0, 1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10, 11],
         ];
         return validHouses[player].includes(house) && this.state[house];
     }

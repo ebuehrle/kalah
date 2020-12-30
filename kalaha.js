@@ -22,8 +22,8 @@ let boardView = new BoardView(stoneViews, houses, stores);
 
 window.addEventListener('resize', () => boardView.render());
 
-function setPlayer(player) {
-    boardView.setPlayer(player);
+function activePlayer(player) {
+    boardView.activePlayer(player);
     messageText.innerHTML = `${player ? p1Name.innerHTML : p0Name.innerHTML}, your turn.`
 }
 
@@ -32,7 +32,7 @@ function resetGame(board=new Board(), player=0) {
         board: board,
         player: player,
     };
-    setPlayer(gameState.player);
+    activePlayer(gameState.player);
     boardView.render(gameState.board.state);
 }
 
@@ -52,7 +52,7 @@ houses.forEach((houseView, slotIdx) => {
         gameState.board = boardPickup;
         gameState.player = (gameState.player + 1) % 2;
         history.pushState(gameState, document.title);
-        setPlayer(gameState.player);
+        activePlayer(gameState.player);
 
         if (!gameState.board.canMove(gameState.player)) {
             const p0Score = gameState.board.playerScore(0);
