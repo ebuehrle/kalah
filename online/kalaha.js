@@ -27,22 +27,32 @@ function activePlayer(player) {
     messageText.innerHTML = `${player ? p1Name.innerHTML : p0Name.innerHTML}, your turn.`
 }
 
-firebase.auth().signInAnonymously()
-    .then(() => console.log('Signed in anonymously.', firebase.auth().currentUser))
-    .then(() => attachListeners())
-    .catch(e => console.error('Could not sign in: ', e));
-
 let username = null;
 let seekUsername = null;
 let gameId = null;
+let db = null;
+
+firebase.auth().signInAnonymously()
+    .then(() => console.log('Signed in anonymously.', firebase.auth().currentUser))
+    .then(() => { db = firebase.firestore() })
+    .then(() => db.collection('users').doc(firebase.auth().currentUser.uid).get())
+    .then(userDocSnapshot => {
+        username = userDocSnapshot.get('username') || 'Player 0';
+        seekUsername = userDocSnapshot.get('seek-username') || 'Player 1';
+        p0Name.innerHTML = username;
+        p1Name.innerHTML = seekUsername;
+    })
+    .then(() => db.collection('users').doc(firebase.auth().currentUser.uid).set({
+        'username': username,
+    }))
+    .then(() => attachListeners())
+    .catch(e => console.error('Error signing in: ', e));
 
 function attachListeners() {
-    let db = firebase.firestore();
-
     document.querySelector('#sign-in').addEventListener('click', () => {
         username = p0Name.innerHTML;
         db.collection('users').doc(firebase.auth().currentUser.uid).update({
-            "username": username,
+            'username': username,
         })
         .then(() => console.log('Username set successfully to ', username))
         .catch(e => console.error('Could not set username: ', e));
@@ -50,72 +60,121 @@ function attachListeners() {
 
     document.querySelector('#challenge').addEventListener('click', () => {
         seekUsername = p1Name.innerHTML;
-        db.collection('users').doc(firebase.auth().currentUser.uid).update({
+        let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
+        userDocRef.update({
             "seek-username": seekUsername,
         })
         .then(() => console.log('Challenge registered successfully for ', seekUsername))
         .catch(e => console.error('Could not register challenge: ', e))
-        .then(() => db.collection('users').where('username', '==', seekUsername).limit(1).get())
-        .then(opponentQuery => {
-            if (opponentQuery.empty) {
-                throw 'No user with username ' + seekUsername + ' online.';
+        .then(() => db.collection('users')
+            .where('username', '==', seekUsername)
+            .where('seek-username', '==', username)
+            .limit(1).get()
+        )
+        .then(opponentQuerySnapshot => {
+            if (opponentQuerySnapshot.empty) {
+                throw 'No matching opponent online.';
             }
-            opponentQuery.forEach(opponentDoc => {
-                const opponentData = opponentDoc.data();
-                if (opponentData['seek-username'] !== username) {
-                    throw 'No reciprocal seek.';
-                }
-                console.log('Creating new game');
+            opponentQuerySnapshot.forEach(opponentQueryDocRef => {
+                db.collection('games').add({ 
+                    'player0': firebase.auth().currentUser.uid,
+                    'player1': opponentQueryDocRef.id,
+                })
+                .then(newGameDocRef => {
+                    userDocRef.update({ 
+                        'game-id': newGameDocRef.id,
+                        'seek-username': firebase.firestore.FieldValue.delete(),
+                    });
+                    opponentQueryDocRef.ref.update({
+                        'game-id': newGameDocRef.id,
+                        'seek-username': firebase.firestore.FieldValue.delete(),
+                    });
+                })
+                .then(() => console.log('Game created successfully.'));
             });
         })
         .catch(e => console.error('Could not search for opponent: ', e));
     });
 
     db.collection('users').doc(firebase.auth().currentUser.uid).onSnapshot(doc => {
-        if ('game-id' in doc && doc['game-id'] !== gameId) {
-            setupGame(doc['game-id']);
+        const newGameId = doc.get('game-id');
+        if (newGameId) {
+            setupGame(newGameId);
         }
     });
 
     console.log('listeners attached');
 }
 
-function setupGame(gameId) {
-    console.log('Entering game ', gameId);
-}
-
+let lastSeenMoveTimestamp = null;
 let gameState = {
-    board: new Board(),
-    player: 0,
+    board: new Board(Array(12).fill(0).concat(24, 24)),
 };
 boardView.render(gameState.board.state);
-activePlayer(gameState.player);
+
+function setupGame(newGameId) {
+    gameId = newGameId;
+    alert('Entering game ', gameId);
+
+    db.collection('games').doc(gameId)
+        .collection('moves').orderBy('timestamp')
+        .onSnapshot(moveQuerySnapshot => moveQuerySnapshot.forEach(moveQueryDocSnapshot => {
+            const moveTimestamp = moveQueryDocSnapshot.get('timestamp');
+            if (moveTimestamp <= lastSeenMoveTimestamp) {
+                return;
+            }
+            lastSeenMoveTimestamp = moveTimestamp;
+
+            const playerUid = moveQueryDocSnapshot.get('uid');
+            const house = moveQueryDocSnapshot.get('house');
+            const isLocalPlayer = playerUid === firebase.auth().currentUser.uid;
+            makeMove(
+                isLocalPlayer ? 0 : 1,
+                isLocalPlayer ? house : house + 6
+            );
+        }));
+    
+    gameState = {
+        board: new Board(),
+    };
+    boardView.render(gameState.board.state);
+}
+
+function makeMove(player, slotIdx) {
+    const moveResult = gameState.board.move(slotIdx, player);
+    if (moveResult === null) {
+        console.error('Received invalid move.', player, slotIdx);
+        return; // invalid move
+    }
+
+    const [boardDistribute, boardPickup] = moveResult;
+    boardView.render(boardDistribute.state).then(() => boardView.render(boardPickup.state));
+
+    gameState.board = boardPickup;
+    const nextPlayer = (player + 1) % 2;
+
+    if (!gameState.board.canMove(nextPlayer)) {
+        const p0Score = gameState.board.playerScore(0);
+        const p1Score = gameState.board.playerScore(1);
+        if (p0Score > p1Score) {
+            messageText.innerHTML = `${p0Name.innerHTML} wins with ${p0Score} &mdash; ${p1Score}.`;
+        } else if (p1Score > p0Score) {
+            messageText.innerHTML = `${p1Name.innerHTML} wins with ${p1Score} &mdash; ${p0Score}.`;
+        } else {
+            messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
+        }
+    }
+}
 
 houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
-        const moveResult = gameState.board.move(slotIdx, gameState.player);
-        if (moveResult === null) {
-            return; // invalid move
-        }
-
-        const [boardDistribute, boardPickup] = moveResult;
-        boardView.render(boardDistribute.state).then(() => boardView.render(boardPickup.state));
-
-        gameState.board = boardPickup;
-        gameState.player = (gameState.player + 1) % 2;
-        history.pushState(gameState, document.title);
-        activePlayer(gameState.player);
-
-        if (!gameState.board.canMove(gameState.player)) {
-            const p0Score = gameState.board.playerScore(0);
-            const p1Score = gameState.board.playerScore(1);
-            if (p0Score > p1Score) {
-                messageText.innerHTML = `${p0Name.innerHTML} wins with ${p0Score} &mdash; ${p1Score}.`;
-            } else if (p1Score > p0Score) {
-                messageText.innerHTML = `${p1Name.innerHTML} wins with ${p1Score} &mdash; ${p0Score}.`;
-            } else {
-                messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
-            }
-        }
+        console.log('click', slotIdx);
+        db.collection('games').doc(gameId).collection('moves').add({
+            'uid': firebase.auth().currentUser.uid,
+            'house': slotIdx,
+            'timestamp': firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => console.log('Move added successfully.'))
+        .catch(e => console.error('Could not add move: ', e));
     });
 });
