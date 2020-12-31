@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <title>Kalah</title>
+        <meta charset='UTF-8'>
+
+        <link rel="preconnect" href="https://fonts.gstatic.com"> 
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+        <link rel='stylesheet' href='kalaha.css'/>
+    </head>
+    <body>
+        <header>
+            <h1 class='logo'>Ka<span class='logo--lambda'>λ</span>ah</h1>
+        </header>
+        <main>
+            <div class='player-names'>
+                <span class='player-name player0' contenteditable='true'>Player 0</span>
+                <span class='player-name player1' contenteditable='true'>Player 1</span>
+            </div>
+            <div class='board'>
+                <div class='store' id='store0'></div>
+                <div class='store' id='store1'></div>
+
+                <div class='house' id='h0'></div>
+                <div class='house' id='h1'></div>
+                <div class='house' id='h2'></div>
+                <div class='house' id='h3'></div>
+                <div class='house' id='h4'></div>
+                <div class='house' id='h5'></div>
+                <div class='house' id='h6'></div>
+                <div class='house' id='h7'></div>
+                <div class='house' id='h8'></div>
+                <div class='house' id='h9'></div>
+                <div class='house' id='h10'></div>
+                <div class='house' id='h11'></div>
+
+                <div class='stone dummy s0'></div>
+                <div class='stone dummy s1'></div>
+                <div class='stone dummy s2'></div>
+                <div class='stone dummy s3'></div>
+                <div class='stone dummy s4'></div>
+                <div class='stone dummy s5'></div>
+                <div class='stone dummy s6'></div>
+                <div class='stone dummy s7'></div>
+                <div class='stone dummy s8'></div>
+                <div class='stone dummy s9'></div>
+                <div class='stone dummy s10'></div>
+                <div class='stone dummy s11'></div>
+                <div class='stone dummy s12'></div>
+                <div class='stone dummy s13'></div>
+                <div class='stone dummy s14'></div>
+                <div class='stone dummy s15'></div>
+                <div class='stone dummy s16'></div>
+                <div class='stone dummy s17'></div>
+                <div class='stone dummy s18'></div>
+                <div class='stone dummy s19'></div>
+                <div class='stone dummy s20'></div>
+                <div class='stone dummy s21'></div>
+                <div class='stone dummy s22'></div>
+                <div class='stone dummy s23'></div>
+                <div class='stone dummy s24'></div>
+                <div class='stone dummy s25'></div>
+                <div class='stone dummy s26'></div>
+                <div class='stone dummy s27'></div>
+                <div class='stone dummy s28'></div>
+                <div class='stone dummy s29'></div>
+                <div class='stone dummy s30'></div>
+                <div class='stone dummy s31'></div>
+                <div class='stone dummy s32'></div>
+                <div class='stone dummy s33'></div>
+                <div class='stone dummy s34'></div>
+                <div class='stone dummy s35'></div>
+                <div class='stone dummy s36'></div>
+                <div class='stone dummy s37'></div>
+                <div class='stone dummy s38'></div>
+                <div class='stone dummy s39'></div>
+                <div class='stone dummy s40'></div>
+                <div class='stone dummy s41'></div>
+                <div class='stone dummy s42'></div>
+                <div class='stone dummy s43'></div>
+                <div class='stone dummy s44'></div>
+                <div class='stone dummy s45'></div>
+                <div class='stone dummy s46'></div>
+                <div class='stone dummy s47'></div>
+
+                <div class='stone real s0'></div>
+                <div class='stone real s1'></div>
+                <div class='stone real s2'></div>
+                <div class='stone real s3'></div>
+                <div class='stone real s4'></div>
+                <div class='stone real s5'></div>
+                <div class='stone real s6'></div>
+                <div class='stone real s7'></div>
+                <div class='stone real s8'></div>
+                <div class='stone real s9'></div>
+                <div class='stone real s10'></div>
+                <div class='stone real s11'></div>
+                <div class='stone real s12'></div>
+                <div class='stone real s13'></div>
+                <div class='stone real s14'></div>
+                <div class='stone real s15'></div>
+                <div class='stone real s16'></div>
+                <div class='stone real s17'></div>
+                <div class='stone real s18'></div>
+                <div class='stone real s19'></div>
+                <div class='stone real s20'></div>
+                <div class='stone real s21'></div>
+                <div class='stone real s22'></div>
+                <div class='stone real s23'></div>
+                <div class='stone real s24'></div>
+                <div class='stone real s25'></div>
+                <div class='stone real s26'></div>
+                <div class='stone real s27'></div>
+                <div class='stone real s28'></div>
+                <div class='stone real s29'></div>
+                <div class='stone real s30'></div>
+                <div class='stone real s31'></div>
+                <div class='stone real s32'></div>
+                <div class='stone real s33'></div>
+                <div class='stone real s34'></div>
+                <div class='stone real s35'></div>
+                <div class='stone real s36'></div>
+                <div class='stone real s37'></div>
+                <div class='stone real s38'></div>
+                <div class='stone real s39'></div>
+                <div class='stone real s40'></div>
+                <div class='stone real s41'></div>
+                <div class='stone real s42'></div>
+                <div class='stone real s43'></div>
+                <div class='stone real s44'></div>
+                <div class='stone real s45'></div>
+                <div class='stone real s46'></div>
+                <div class='stone real s47'></div>
+            </div>
+            <div class='message'>
+                <p class='text'>Player 0 to move.</p>
+                <button class='refresh'>Restart</button>
+            </div>
+        </main>
+
+        <script src='board.js'></script>
+        <script src='stoneview.js'></script>
+        <script src='boardview.js'></script>
+        <script src='kalaha.js'></script>
+    </body>
+</html>
