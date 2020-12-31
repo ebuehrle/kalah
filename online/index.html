@@ -16,8 +16,8 @@
         <main>
             <div class='player-names'>
                 <span class='player-name player0' contenteditable='true'>Player 0</span>
-                <button>OK</button>
-                <button>Challenge</button>
+                <button id='sign-in'>Sign In</button>
+                <button id='challenge'>Challenge</button>
                 <span class='player-name player1' contenteditable='true'>Player 1</span>
             </div>
             <div class='board'>
@@ -140,6 +140,32 @@
                 <button class='refresh'>Restart</button>
             </div>
         </main>
+
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-analytics.js"></script>
+
+        <script>
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        var firebaseConfig = {
+            apiKey: "AIzaSyDkwh36I9GNNUI5y63gt6ePuZuTsEqVABE",
+            authDomain: "kalaha-edbd5.firebaseapp.com",
+            projectId: "kalaha-edbd5",
+            storageBucket: "kalaha-edbd5.appspot.com",
+            messagingSenderId: "704201592907",
+            appId: "1:704201592907:web:deaa4b44c20a787fbc7dce",
+            measurementId: "G-700X0QNFN7"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        </script>
 
         <script src='./board.js'></script>
         <script src='./stoneview.js'></script>

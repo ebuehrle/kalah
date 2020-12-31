@@ -27,17 +27,69 @@ function activePlayer(player) {
     messageText.innerHTML = `${player ? p1Name.innerHTML : p0Name.innerHTML}, your turn.`
 }
 
-function resetGame(board=new Board(), player=0) {
-    gameState = {
-        board: board,
-        player: player,
-    };
-    activePlayer(gameState.player);
-    boardView.render(gameState.board.state);
+firebase.auth().signInAnonymously()
+    .then(() => console.log('Signed in anonymously.', firebase.auth().currentUser))
+    .then(() => attachListeners())
+    .catch(e => console.error('Could not sign in: ', e));
+
+let username = null;
+let seekUsername = null;
+let gameId = null;
+
+function attachListeners() {
+    let db = firebase.firestore();
+
+    document.querySelector('#sign-in').addEventListener('click', () => {
+        username = p0Name.innerHTML;
+        db.collection('users').doc(firebase.auth().currentUser.uid).update({
+            "username": username,
+        })
+        .then(() => console.log('Username set successfully to ', username))
+        .catch(e => console.error('Could not set username: ', e));
+    });
+
+    document.querySelector('#challenge').addEventListener('click', () => {
+        seekUsername = p1Name.innerHTML;
+        db.collection('users').doc(firebase.auth().currentUser.uid).update({
+            "seek-username": seekUsername,
+        })
+        .then(() => console.log('Challenge registered successfully for ', seekUsername))
+        .catch(e => console.error('Could not register challenge: ', e))
+        .then(() => db.collection('users').where('username', '==', seekUsername).limit(1).get())
+        .then(opponentQuery => {
+            if (opponentQuery.empty) {
+                throw 'No user with username ' + seekUsername + ' online.';
+            }
+            opponentQuery.forEach(opponentDoc => {
+                const opponentData = opponentDoc.data();
+                if (opponentData['seek-username'] !== username) {
+                    throw 'No reciprocal seek.';
+                }
+                console.log('Creating new game');
+            });
+        })
+        .catch(e => console.error('Could not search for opponent: ', e));
+    });
+
+    db.collection('users').doc(firebase.auth().currentUser.uid).onSnapshot(doc => {
+        if ('game-id' in doc && doc['game-id'] !== gameId) {
+            setupGame(doc['game-id']);
+        }
+    });
+
+    console.log('listeners attached');
 }
 
-resetGame();
-history.pushState(gameState, document.title);
+function setupGame(gameId) {
+    console.log('Entering game ', gameId);
+}
+
+let gameState = {
+    board: new Board(),
+    player: 0,
+};
+boardView.render(gameState.board.state);
+activePlayer(gameState.player);
 
 houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
@@ -66,13 +118,4 @@ houses.forEach((houseView, slotIdx) => {
             }
         }
     });
-});
-
-document.querySelector('button.refresh').addEventListener('click', () => {
-    resetGame();
-    history.pushState(gameState, document.title);
-});
-
-window.addEventListener('popstate', ev => {
-    resetGame(new Board(ev.state.board.state), ev.state.player);
 });
