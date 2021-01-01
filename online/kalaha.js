@@ -22,9 +22,14 @@ let boardView = new BoardView(stoneViews, houses, stores);
 
 window.addEventListener('resize', () => boardView.render());
 
-function activePlayer(player) {
-    boardView.activePlayer(player);
-    messageText.innerHTML = `${player ? p1Name.innerHTML : p0Name.innerHTML}, your turn.`
+function activatePlayer(player) {
+    if (player === 0) {
+        boardView.activatePlayer(0);
+        messageText.innerHTML = `${username}, your turn.`
+    } else {
+        boardView.inactivatePlayer(0);
+        messageText.innerHTML = `Waiting for ${seekUsername}.`
+    }
 }
 
 let username = null;
@@ -49,7 +54,7 @@ firebase.auth().signInAnonymously()
     .catch(e => console.error('Error signing in: ', e));
 
 function attachListeners() {
-    document.querySelector('#sign-in').addEventListener('click', () => {
+    document.querySelector('.sign-in').addEventListener('click', () => {
         username = p0Name.innerHTML;
         db.collection('users').doc(firebase.auth().currentUser.uid).update({
             'username': username,
@@ -58,7 +63,7 @@ function attachListeners() {
         .catch(e => console.error('Could not set username: ', e));
     });
 
-    document.querySelector('#challenge').addEventListener('click', () => {
+    document.querySelector('.challenge').addEventListener('click', () => {
         seekUsername = p1Name.innerHTML;
         let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
         userDocRef.update({
@@ -106,15 +111,30 @@ function attachListeners() {
     console.log('listeners attached');
 }
 
-let lastSeenMoveTimestamp = null;
+let lastSeenMoveTimestamp = undefined;
 let gameState = {
     board: new Board(Array(12).fill(0).concat(24, 24)),
+    player: undefined,
 };
 boardView.render(gameState.board.state);
 
 function setupGame(newGameId) {
     gameId = newGameId;
     alert('Entering game ', gameId);
+
+    gameState = {
+        board: new Board(),
+        player: undefined,
+    };
+    boardView.render(gameState.board.state);
+
+    db.collection('games').doc(gameId).get()
+        .then(docSnapshot => {
+            const player0Uid = docSnapshot.get('player0');
+            const isLocalPlayer = player0Uid === firebase.auth().currentUser.uid;
+            gameState.player = isLocalPlayer ? 0 : 1;
+            activatePlayer(gameState.player);
+        });
 
     db.collection('games').doc(gameId)
         .collection('moves').orderBy('timestamp')
@@ -133,11 +153,6 @@ function setupGame(newGameId) {
                 isLocalPlayer ? house : house + 6
             );
         }));
-    
-    gameState = {
-        board: new Board(),
-    };
-    boardView.render(gameState.board.state);
 }
 
 function makeMove(player, slotIdx) {
@@ -152,6 +167,7 @@ function makeMove(player, slotIdx) {
 
     gameState.board = boardPickup;
     const nextPlayer = (player + 1) % 2;
+    activatePlayer(nextPlayer);
 
     if (!gameState.board.canMove(nextPlayer)) {
         const p0Score = gameState.board.playerScore(0);
