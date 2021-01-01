@@ -9,7 +9,7 @@ const stores = Array.from(document.querySelectorAll('.store'));
 
 const p0Name = document.querySelector('.player0');
 const p1Name = document.querySelector('.player1');
-const messageText = document.querySelector('.message .text');
+const messageText = document.querySelector('.message');
 const refreshButton = document.querySelector('button.refresh');
 
 realStones.forEach(s => s.classList.add([
@@ -120,7 +120,7 @@ boardView.render(gameState.board.state);
 
 function setupGame(newGameId) {
     gameId = newGameId;
-    alert('Entering game ', gameId);
+    alert(`${seekUsername} has accepted your challenge.`);
 
     gameState = {
         board: new Board(),

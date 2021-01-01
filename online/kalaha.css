@@ -182,9 +182,6 @@ main {
 
 .message {
     text-align: center;
-}
-
-.message .text {
     font-size: 1.2em;
     margin: 2em 0;
 }
