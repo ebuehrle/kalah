@@ -44,8 +44,8 @@ firebase.auth().signInAnonymously()
     .then(userDocSnapshot => {
         username = userDocSnapshot.get('username') || 'Player 0';
         seekUsername = userDocSnapshot.get('seek-username') || 'Player 1';
-        p0Name.innerHTML = username;
-        p1Name.innerHTML = seekUsername;
+        p0Name.value = username;
+        p1Name.value = seekUsername;
     })
     .then(() => db.collection('users').doc(firebase.auth().currentUser.uid).set({
         'username': username,
@@ -55,7 +55,7 @@ firebase.auth().signInAnonymously()
 
 function attachListeners() {
     document.querySelector('.sign-in').addEventListener('click', () => {
-        username = p0Name.innerHTML;
+        username = p0Name.value;
         db.collection('users').doc(firebase.auth().currentUser.uid).update({
             'username': username,
         })
@@ -64,7 +64,7 @@ function attachListeners() {
     });
 
     document.querySelector('.challenge').addEventListener('click', () => {
-        seekUsername = p1Name.innerHTML;
+        seekUsername = p1Name.value;
         let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
         userDocRef.update({
             "seek-username": seekUsername,
@@ -173,9 +173,9 @@ function makeMove(player, slotIdx) {
         const p0Score = gameState.board.playerScore(0);
         const p1Score = gameState.board.playerScore(1);
         if (p0Score > p1Score) {
-            messageText.innerHTML = `${p0Name.innerHTML} wins with ${p0Score} &mdash; ${p1Score}.`;
+            messageText.innerHTML = `${username} wins with ${p0Score} &mdash; ${p1Score}.`;
         } else if (p1Score > p0Score) {
-            messageText.innerHTML = `${p1Name.innerHTML} wins with ${p1Score} &mdash; ${p0Score}.`;
+            messageText.innerHTML = `${seekUsername} wins with ${p1Score} &mdash; ${p0Score}.`;
         } else {
             messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
         }

@@ -16,7 +16,7 @@ body {
 
 header {
     margin-top: 2em;
-    margin-bottom: 3.5em;
+    margin-bottom: 3em;
     text-align: center;
 }
 
@@ -41,15 +41,58 @@ main {
 }
 
 .player-names {
-    margin: 2em 0;
+    margin: 1em 0;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
 .player-name {
-    margin: 0 1em;
+    width: 23.8%;
+    padding: 0.25em 1em;
     font-size: 1.5em;
+    background: transparent;
+    border: 1px solid rgb(255, 255, 255, 0.5);
+    color: inherit;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: inherit;
+    text-shadow: inherit;
+}
+
+.player-names button.sign-in,
+.player-names button.challenge,
+.message .refresh {
+    padding: 1em;
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    background-color: transparent;
+    
+    transition: box-shadow 0.5s ease;
+    cursor: pointer;
+}
+
+.player-names button.sign-in:hover,
+.player-names button.challenge:hover,
+.message .refresh:hover {
+    box-shadow: 2px 2px 20px rgba(41, 44, 51, 0.5);
+    background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
+        rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03));
+}
+
+.player-names button.sign-in {
+    margin-left: 20px;
+    margin-right: auto;
+}
+
+.player-names button.challenge {
+    margin-right: 20px;
+    margin-left: auto;
+}
+
+.player1 {
+    text-align: right;
 }
 
 .board {
@@ -144,23 +187,6 @@ main {
 .message .text {
     font-size: 1.2em;
     margin: 2em 0;
-}
-
-.message .refresh {
-    padding: 1em;
-    color: inherit;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-    background-color: transparent;
-    
-    transition: box-shadow 0.5s ease;
-    cursor: pointer;
-}
-
-.message .refresh:hover {
-    box-shadow: 2px 2px 20px rgba(41, 44, 51, 0.5);
-    background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
-        rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03));
 }
 
 #store0 {
