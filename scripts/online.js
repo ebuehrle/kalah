@@ -1,25 +1,12 @@
-// import { Board } from './board.js';
-// import { BoardView } from './boardview.js';
-// import { StoneView } from './stoneview.js';
-  
-const dummyStones = Array.from(document.querySelectorAll('.stone.dummy'));
-const realStones = Array.from(document.querySelectorAll('.stone.real'));
-const houses = Array.from(document.querySelectorAll('.house'));
-const stores = Array.from(document.querySelectorAll('.store'));
+// import { Kalaha } from './kalaha.js';
+// import { KalahaBoard } from './kalahaboard.js';
 
 const p0Name = document.querySelector('.player0');
-const signInStatus = document.querySelector('.sign-in .status');
 const p1Name = document.querySelector('.player1');
-const challengeStatus = document.querySelector('.challenge .status');
 const messageText = document.querySelector('.message');
-
-realStones.forEach(s => s.classList.add([
-    'red', 'green', 'yellow',
-    'blue', 'purple', 'cyan'
-][Math.floor(Math.random() * 6)]));
-
-const stoneViews = realStones.map((realStone, i) => new StoneView(dummyStones[i], realStone));
-let boardView = new BoardView(stoneViews, houses, stores);
+const signInStatus = document.querySelector('.sign-in .status');
+const challengeStatus = document.querySelector('.challenge .status');
+const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
 
 window.addEventListener('resize', () => boardView.render());
 
@@ -149,7 +136,7 @@ function attachListeners() {
 
 let lastSeenMoveTimestamp = undefined;
 let gameState = {
-    board: new Board(Array(12).fill(0).concat(24, 24)),
+    board: new Kalaha(Array(12).fill(0).concat(24, 24)),
     player: undefined,
 };
 boardView.render(gameState.board.state);
@@ -159,7 +146,7 @@ function setupGame(newGameId) {
     challengeStatus.innerHTML = 'done_all';
 
     gameState = {
-        board: new Board(),
+        board: new Kalaha(),
         player: undefined,
     };
     boardView.render(gameState.board.state);
@@ -218,7 +205,7 @@ function makeMove(player, slotIdx) {
     }
 }
 
-houses.forEach((houseView, slotIdx) => {
+boardView.houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
         console.log('click', slotIdx);
         db.collection('games').doc(gameId).collection('moves').add({

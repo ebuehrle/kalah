@@ -1,4 +1,4 @@
-class Board {
+class Kalaha {
     constructor(state=Array(12).fill(4).concat([0, 0])) {
         this.state = state;
     }
@@ -40,7 +40,7 @@ class Board {
 
         const statePickup = newState.slice();
 
-        return [new Board(stateDistribute), new Board(statePickup)];
+        return [new Kalaha(stateDistribute), new Kalaha(statePickup)];
     }
 
     moveValid(player, house) {
@@ -65,4 +65,4 @@ class Board {
     }
 }
 
-// export { Board };
+// export { Kalaha };

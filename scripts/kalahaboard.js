@@ -1,17 +1,43 @@
-class BoardView {
-    constructor(stoneViews, houses, stores, boardState=Array(12).fill(4).concat([0, 0])) {
-        this.elementTransitionDuration = 0.5; // from CSS
-        this.elementTransitionDelay = 0.1; // in s
+class KalahaBoard {
+    constructor(wrapper, boardState=Array(12).fill(4).concat([0, 0])) {
+        const stones = boardState.reduce((p, c) => p + c, 0);
 
-        this.stoneViews = stoneViews;
-        this.houses = houses;
-        this.stores = stores;
+        const board = document.createElement('div');
+        board.classList.add('board');
+        wrapper.appendChild(board);
+
+        this.stoneViews = [...Array(stones).keys()].sort(() => Math.random() - 0.5).map(i => {
+            const dummy = document.createElement('div');
+            dummy.classList.add('stone', 'dummy', `s${i}`);
+            board.appendChild(dummy);
+            const real = document.createElement('div');
+            real.classList.add('stone', 'real', `s${i}`);
+            board.appendChild(real);
+            return new StoneView(dummy, real);
+        });
+
+        this.houses = [...Array(boardState.length - 2).keys()].map(i => {
+            const house = document.createElement('div');
+            house.classList.add('house', `h${i}`);
+            board.appendChild(house);
+            return house;
+        });
+
+        this.stores = [...Array(2).keys()].map(i => {
+            const store = document.createElement('div');
+            store.classList.add('store', `store${i}`);
+            board.appendChild(store);
+            return store;
+        });
 
         let stoneIndex = 0;
         this.state = boardState.map(numStones => {
            stoneIndex += numStones;
            return this.stoneViews.slice(stoneIndex - numStones, stoneIndex);
         });
+
+        this.elementTransitionDuration = 0.5; // from CSS
+        this.elementTransitionDelay = 0.1; // in s
     }
 
     _transition(boardState) {
@@ -104,4 +130,30 @@ class BoardView {
     }
 }
 
-// export { BoardView };
+class StoneView {
+    constructor(dummy, real) {
+        this.dummy = dummy;
+        this.real = real;
+    }
+
+    computeOffset() {
+        let dummyRect = this.dummy.getBoundingClientRect();
+        let parentRect = this.real.offsetParent.getBoundingClientRect();
+        let offsetTop = dummyRect.top - parentRect.top;
+        let offsetLeft = dummyRect.left - parentRect.left;
+        return [offsetTop, offsetLeft];
+    }
+
+    requiresUpdate() {
+        let [offsetTop, offsetLeft] = this.computeOffset();
+        return Math.abs(offsetTop - this.real.offsetTop) > 1 || Math.abs(offsetLeft - this.real.offsetLeft) > 1;
+    }
+
+    update() {
+        let [offsetTop, offsetLeft] = this.computeOffset();
+        this.real.style.top = `${offsetTop}px`;
+        this.real.style.left = `${offsetLeft}px`;
+    }
+}
+
+// export { KalahaBoard };

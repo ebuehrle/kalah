@@ -1,24 +1,11 @@
-// import { Board } from './board.js';
-// import { BoardView } from './boardview.js';
-// import { StoneView } from './stoneview.js';
-  
-const dummyStones = Array.from(document.querySelectorAll('.stone.dummy'));
-const realStones = Array.from(document.querySelectorAll('.stone.real'));
-const houses = Array.from(document.querySelectorAll('.house'));
-const stores = Array.from(document.querySelectorAll('.store'));
+// import { Kalaha } from './kalaha.js';
+// import { KalahaBoard } from './kalahaboard.js';
 
 const p0Name = document.querySelector('.player0');
 const p1Name = document.querySelector('.player1');
 const messageText = document.querySelector('.message');
 const refreshButton = document.querySelector('button.refresh');
-
-realStones.forEach(s => s.classList.add([
-    'red', 'green', 'yellow',
-    'blue', 'purple', 'cyan'
-][Math.floor(Math.random() * 6)]));
-
-const stoneViews = realStones.map((realStone, i) => new StoneView(dummyStones[i], realStone));
-let boardView = new BoardView(stoneViews, houses, stores);
+const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
 
 window.addEventListener('resize', () => boardView.render());
 
@@ -28,7 +15,7 @@ function activePlayer(player) {
     messageText.innerHTML = `${player ? p1Name.value : p0Name.value}, your turn.`
 }
 
-function resetGame(board=new Board(), player=0) {
+function resetGame(board=new Kalaha(), player=0) {
     gameState = {
         board: board,
         player: player,
@@ -40,7 +27,7 @@ function resetGame(board=new Board(), player=0) {
 resetGame();
 history.pushState(gameState, document.title);
 
-houses.forEach((houseView, slotIdx) => {
+boardView.houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
         const moveResult = gameState.board.move(slotIdx, gameState.player);
         if (moveResult === null) {
@@ -75,5 +62,5 @@ document.querySelector('button.refresh').addEventListener('click', () => {
 });
 
 window.addEventListener('popstate', ev => {
-    resetGame(new Board(ev.state.board.state), ev.state.player);
+    resetGame(new Kalaha(ev.state.board.state), ev.state.player);
 });

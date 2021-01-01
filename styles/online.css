@@ -17,25 +17,25 @@ button .status{
     font-size: 1.5em;
 }
 
-#s0.active,
-#h0.active,
-#h1.active,
-#h2.active,
-#h3.active,
-#h4.active,
-#h5.active {
+.store0.active,
+.h0.active,
+.h1.active,
+.h2.active,
+.h3.active,
+.h4.active,
+.h5.active {
     box-shadow: 4px 4px 20px rgba(41, 44, 51, 0.5);
     background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
         rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03));
 }
 
-#s0.active:hover,
-#h0.active:hover,
-#h1.active:hover,
-#h2.active:hover,
-#h3.active:hover,
-#h4.active:hover,
-#h5.active:hover {
+.store0.active:hover,
+.h0.active:hover,
+.h1.active:hover,
+.h2.active:hover,
+.h3.active:hover,
+.h4.active:hover,
+.h5.active:hover {
     cursor: pointer;
     box-shadow: 5px 5px 25px rgba(41, 44, 51, 0.6);
 }

@@ -48,94 +48,100 @@
     box-shadow: 2px 2px 10px rgba(41, 44, 51, 0.5);
 }
 
-.red {
+.real.s0, .real.s1, .real.s2, .real.s3,
+.real.s4, .real.s5, .real.s6, .real.s7 {
     background-color: rgb(209, 114, 119);
 }
 
-.green {
+.real.s8, .real.s9, .real.s10, .real.s11,
+.real.s12, .real.s13, .real.s14, .real.s15 {
     background-color: rgb(161, 194, 129);
 }
 
-.yellow {
+.real.s16, .real.s17, .real.s18, .real.s19,
+.real.s20, .real.s21, .real.s22, .real.s23 {
     background-color: rgb(223, 192, 132);
 }
 
-.blue {
+.real.s24, .real.s25, .real.s26, .real.s27,
+.real.s28, .real.s29, .real.s30, .real.s31 {
     background-color: rgb(116, 173, 233);
 }
 
-.purple {
+.real.s32, .real.s33, .real.s34, .real.s35,
+.real.s36, .real.s37, .real.s38, .real.s39 {
     background-color: rgb(188, 124, 215);
 }
 
-.cyan {
+.real.s40, .real.s41, .real.s42, .real.s43,
+.real.s44, .real.s45, .real.s46, .real.s47 {
     background-color: rgb(112, 180, 192);
 }
 
-#store0 {
+.store0 {
     grid-column: 1;
 }
 
-#store1 {
+.store1 {
     grid-column: 8;
 }
 
-#h0 {
+.h0 {
     grid-row: 2;
     grid-column: 4;
 }
 
-#h1 {
+.h1 {
     grid-row: 2;
     grid-column: 3;
 }
 
-#h2 {
+.h2 {
     grid-row: 2;
     grid-column: 2;
 }
 
-#h3 {
+.h3 {
     grid-row: 1;
     grid-column: 2;
 }
 
-#h4 {
+.h4 {
     grid-row: 1;
     grid-column: 3;
 }
 
-#h5 {
+.h5 {
     grid-row: 1;
     grid-column: 4;
 }
 
-#h6 {
+.h6 {
     grid-row: 1;
     grid-column: 5;
 }
 
-#h7 {
+.h7 {
     grid-row: 1;
     grid-column: 6;
 }
 
-#h8 {
+.h8 {
     grid-row: 1;
     grid-column: 7;
 }
 
-#h9 {
+.h9 {
     grid-row: 2;
     grid-column: 7;
 }
 
-#h10 {
+.h10 {
     grid-row: 2;
     grid-column: 6;
 }
 
-#h11 {
+.h11 {
     grid-row: 2;
     grid-column: 5;
 }
