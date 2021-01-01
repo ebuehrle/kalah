@@ -1,8 +1,8 @@
 // import { Kalaha } from './kalaha.js';
 // import { KalahaBoard } from './kalahaboard.js';
 
-const p0Name = document.querySelector('.player0');
-const p1Name = document.querySelector('.player1');
+let p0Name = () => (document.querySelector('.player0').value || 'Left');
+let p1Name = () => (document.querySelector('.player1').value || 'Right');
 const messageText = document.querySelector('.message');
 const refreshButton = document.querySelector('button.refresh');
 const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
@@ -12,7 +12,7 @@ window.addEventListener('resize', () => boardView.render());
 function activePlayer(player) {
     boardView.activatePlayer(player);
     boardView.inactivatePlayer((player + 1) % 2);
-    messageText.innerHTML = `${player ? p1Name.value : p0Name.value}, your turn.`
+    messageText.innerHTML = `${player ? p1Name() : p0Name()}, your turn.`
 }
 
 function resetGame(board=new Kalaha(), player=0) {
@@ -46,9 +46,9 @@ boardView.houses.forEach((houseView, slotIdx) => {
             const p0Score = gameState.board.playerScore(0);
             const p1Score = gameState.board.playerScore(1);
             if (p0Score > p1Score) {
-                messageText.innerHTML = `${p0Name.value} wins with ${p0Score} &mdash; ${p1Score}.`;
+                messageText.innerHTML = `${p0Name()} wins with ${p0Score} &mdash; ${p1Score}.`;
             } else if (p1Score > p0Score) {
-                messageText.innerHTML = `${p1Name.value} wins with ${p1Score} &mdash; ${p0Score}.`;
+                messageText.innerHTML = `${p1Name()} wins with ${p1Score} &mdash; ${p0Score}.`;
             } else {
                 messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
             }
