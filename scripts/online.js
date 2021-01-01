@@ -24,11 +24,11 @@ let boardView = new BoardView(stoneViews, houses, stores);
 window.addEventListener('resize', () => boardView.render());
 
 function activatePlayer(player) {
+    boardView.activatePlayer(player);
+    boardView.inactivatePlayer((player + 1) % 2);
     if (player === 0) {
-        boardView.activatePlayer(0);
         messageText.innerHTML = `${username}, your turn.`
     } else {
-        boardView.inactivatePlayer(0);
         messageText.innerHTML = `Waiting for ${seekUsername}.`
     }
 }

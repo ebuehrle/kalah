@@ -23,7 +23,8 @@ let boardView = new BoardView(stoneViews, houses, stores);
 window.addEventListener('resize', () => boardView.render());
 
 function activePlayer(player) {
-    boardView.activePlayer(player);
+    boardView.activatePlayer(player);
+    boardView.inactivatePlayer((player + 1) % 2);
     messageText.innerHTML = `${player ? p1Name.value : p0Name.value}, your turn.`
 }
 

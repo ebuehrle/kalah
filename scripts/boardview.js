@@ -73,7 +73,7 @@ class BoardView {
         });
     }
 
-    activePlayer(player) {
+    activatePlayer(player) {
         const player0Store = this.stores[0];
         const player1Store = this.stores[1];
         const player0Houses = [0, 1, 2, 3, 4, 5].map(i => this.houses[i]);
@@ -82,13 +82,24 @@ class BoardView {
         if (player === 0) {
             player0Store.classList.add('active');
             player0Houses.forEach(h => h.classList.add('active'));
-            player1Store.classList.remove('active');
-            player1Houses.forEach(h => h.classList.remove('active'));
         } else {
             player1Store.classList.add('active');
             player1Houses.forEach(h => h.classList.add('active'));
+        }
+    }
+
+    inactivatePlayer(player) {
+        const player0Store = this.stores[0];
+        const player1Store = this.stores[1];
+        const player0Houses = [0, 1, 2, 3, 4, 5].map(i => this.houses[i]);
+        const player1Houses = [6, 7, 8, 9, 10, 11].map(i => this.houses[i]);
+
+        if (player === 0) {
             player0Store.classList.remove('active');
             player0Houses.forEach(h => h.classList.remove('active'));
+        } else {
+            player1Store.classList.remove('active');
+            player1Houses.forEach(h => h.classList.remove('active'));
         }
     }
 }
