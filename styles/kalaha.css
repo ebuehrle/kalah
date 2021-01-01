@@ -47,8 +47,16 @@ header h1 {
 }
 
 .player-name {
-    width: 23.8%;
-    padding: 0.25em 1em;
+    /* This is what I want: */
+    /* width: 23.8%; */
+    /* padding: 0.25em 1em; */
+
+    /* Trying hard to avoid clipped text shadows
+     * without looking too awkward. */
+    width: 14.8%;
+    text-align: center;
+    line-height: 1.5em;
+
     font-size: 1.5em;
     background: transparent;
     border: none;
@@ -64,10 +72,7 @@ header h1 {
     font-style: italic;
     font-size: 0.75em;
     opacity: 0.5;
-}
-
-.player1 {
-    text-align: right;
+    line-height: 1.5em;
 }
 
 .center {
