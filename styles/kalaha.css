@@ -51,7 +51,10 @@ header h1 {
     padding: 0.25em 1em;
     font-size: 1.5em;
     background: transparent;
-    border: 1px solid rgb(255, 255, 255, 0.5);
+    border-left: none;
+    border-top: none;
+    border-right: none;
+    border-bottom: 1px solid rgb(255, 255, 255, 0.5);
     color: inherit;
     border-radius: 10px;
     font-family: inherit;
