@@ -7,20 +7,29 @@
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
         <link rel='stylesheet' href='styles/kalaha.css'/>
+        <link rel='stylesheet' href='styles/online.css'/>
+        <link rel='stylesheet' href='styles/boardview.css'/>
     </head>
     <body>
         <header>
+            <div class='spacer'></div>
             <h1 class='logo'>Ka<span class='logo--lambda'>λ</span>ah online</h1>
+            <nav class='spacer'>
+                <select onchange='location = this.value; this.value = "#"'>
+                    <option value='#'>Online Game</option></a>
+                    <option value='index.html'>Local Game</option>
+                </select>
+            </nav>        
         </header>
         <main>
             <div class='player-names'>
-                <!--span class='player-name player0' contenteditable='true'>Player 0</span-->
                 <input type='text' class='player-name player0' placeholder='Pick a name...'/>
                 <button class='sign-in'><span>Sign In</span><i class='status material-icons'></i></button>
+                <div class='spacer'></div>
                 <button class='challenge'><span>Challenge</span><i class='status material-icons'></i></button>
                 <input type='text' class='player-name player1' placeholder='Challenge someone...'/>
-                <!--span class='player-name player1' contenteditable='true'>Player 1</span-->
             </div>
             <div class='board'>
                 <div class='store' id='store0'></div>
@@ -137,7 +146,7 @@
                 <div class='stone real s46'></div>
                 <div class='stone real s47'></div>
             </div>
-            <div class='message'></div>
+            <div class='center message'></div>
         </main>
 
         <!-- The core Firebase JS SDK is always required and must be listed first -->
@@ -166,9 +175,9 @@
         firebase.analytics();
         </script>
 
-        <script src='scripts/board.js'></script>
-        <script src='scripts/stoneview.js'></script>
-        <script src='scripts/boardview.js'></script>
-        <script src='scripts/kalaha.js'></script>
+        <script src='scripts/board-online.js'></script>
+        <script src='scripts/stoneview-online.js'></script>
+        <script src='scripts/boardview-online.js'></script>
+        <script src='scripts/kalaha-online.js'></script>
     </body>
 </html>

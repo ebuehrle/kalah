@@ -9,7 +9,7 @@ const stores = Array.from(document.querySelectorAll('.store'));
 
 const p0Name = document.querySelector('.player0');
 const p1Name = document.querySelector('.player1');
-const messageText = document.querySelector('.message .text');
+const messageText = document.querySelector('.message');
 const refreshButton = document.querySelector('button.refresh');
 
 realStones.forEach(s => s.classList.add([
@@ -24,7 +24,7 @@ window.addEventListener('resize', () => boardView.render());
 
 function activePlayer(player) {
     boardView.activePlayer(player);
-    messageText.innerHTML = `${player ? p1Name.innerHTML : p0Name.innerHTML}, your turn.`
+    messageText.innerHTML = `${player ? p1Name.value : p0Name.value}, your turn.`
 }
 
 function resetGame(board=new Board(), player=0) {
@@ -58,9 +58,9 @@ houses.forEach((houseView, slotIdx) => {
             const p0Score = gameState.board.playerScore(0);
             const p1Score = gameState.board.playerScore(1);
             if (p0Score > p1Score) {
-                messageText.innerHTML = `${p0Name.innerHTML} wins with ${p0Score} &mdash; ${p1Score}.`;
+                messageText.innerHTML = `${p0Name.value} wins with ${p0Score} &mdash; ${p1Score}.`;
             } else if (p1Score > p0Score) {
-                messageText.innerHTML = `${p1Name.innerHTML} wins with ${p1Score} &mdash; ${p0Score}.`;
+                messageText.innerHTML = `${p1Name.value} wins with ${p1Score} &mdash; ${p0Score}.`;
             } else {
                 messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
             }

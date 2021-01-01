@@ -65,6 +65,7 @@ function setUsername(name) {
     }
 
     if (name && name !== username) {
+        username = name;
         db.collection('users').doc(firebase.auth().currentUser.uid).set({
             'username': username,
         }, { merge: true })
@@ -77,14 +78,18 @@ function setUsername(name) {
         });
     }
 
-    username = name;
     p0Name.value = username;
 }
 
 function setSeekUsername(name) {
+    if (!name) {
+        return;
+    }
+
+    seekUsername = name;
     let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
     userDocRef.update({
-        'seek-username': name,
+        'seek-username': seekUsername,
     })
     .then(() => { challengeStatus.innerHTML = 'done'; })
     .catch(e => { 
@@ -92,7 +97,7 @@ function setSeekUsername(name) {
         console.error('Could not register challenge: ', e);
     })
     .then(() => db.collection('users')
-        .where('username', '==', name)
+        .where('username', '==', seekUsername)
         .where('seek-username', '==', username)
         .limit(1).get()
     )
@@ -119,6 +124,8 @@ function setSeekUsername(name) {
         });
     })
     .catch(e => console.error('Could not search for opponent: ', e));
+
+    p1Name.value = seekUsername;
 }
 
 function attachListeners() {

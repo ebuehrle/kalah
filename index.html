@@ -7,16 +7,25 @@
         <link rel="preconnect" href="https://fonts.gstatic.com"> 
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+       
         <link rel='stylesheet' href='styles/kalaha.css'/>
+        <link rel='stylesheet' href='styles/boardview.css'/>
     </head>
     <body>
         <header>
+            <div class='spacer'></div>
             <h1 class='logo'>Ka<span class='logo--lambda'>λ</span>ah</h1>
+            <nav class='spacer'>
+                <select onchange='location = this.value; this.value = "#"'>
+                    <option value='#'>Local Game</option>
+                    <option value='online.html'>Online Game</option></a>
+                </select>
+            </nav>
         </header>
         <main>
             <div class='player-names'>
-                <span class='player-name player0' contenteditable='true'>Player 0</span>
-                <span class='player-name player1' contenteditable='true'>Player 1</span>
+                <input type='text' class='player-name player0' placeholder='Pick a name...' value='Player 0'/>
+                <input type='text' class='player-name player1' placeholder='Pick a name...' value='Player 1'/>
             </div>
             <div class='board'>
                 <div class='store' id='store0'></div>
@@ -133,8 +142,8 @@
                 <div class='stone real s46'></div>
                 <div class='stone real s47'></div>
             </div>
-            <div class='message'>
-                <p class='text'>Player 0 to move.</p>
+            <div class='center'>
+                <div class='message'>Player 0 to move.</div>
                 <button class='refresh'>Restart</button>
             </div>
         </main>
