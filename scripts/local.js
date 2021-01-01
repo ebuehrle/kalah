@@ -62,5 +62,5 @@ document.querySelector('button.refresh').addEventListener('click', () => {
 });
 
 window.addEventListener('popstate', ev => {
-    resetGame(new Kalaha(ev.state.board.state), ev.state.player);
+    resetGame(Object.assign(new Kalaha, ev.state.board), ev.state.player);
 });

@@ -92,23 +92,23 @@ function setSeekUsername(name) {
         if (opponentQuerySnapshot.empty) {
             throw 'No matching opponent online.';
         }
-        opponentQuerySnapshot.forEach(opponentQueryDocRef => {
+        opponentQuerySnapshot.forEach(opponentQueryDocRef =>
             db.collection('games').add({ 
                 'player0': firebase.auth().currentUser.uid,
                 'player1': opponentQueryDocRef.id,
             })
-            .then(newGameDocRef => {
-                userDocRef.update({ 
-                    'game-id': newGameDocRef.id,
-                    'seek-username': firebase.firestore.FieldValue.delete(),
-                });
+            .then(newGameDocRef =>
                 opponentQueryDocRef.ref.update({
                     'game-id': newGameDocRef.id,
                     'seek-username': firebase.firestore.FieldValue.delete(),
-                });
-            })
-            .then(() => console.log('Game created successfully.'));
-        });
+                })
+                .then(() => userDocRef.update({ 
+                    'game-id': newGameDocRef.id,
+                    'seek-username': firebase.firestore.FieldValue.delete(),
+                }))
+            )
+            .then(() => console.log('Game created successfully.'))
+        );
     })
     .catch(e => console.error('Could not search for opponent: ', e));
 
@@ -189,10 +189,10 @@ function makeMove(player, slotIdx) {
     boardView.render(boardDistribute.state).then(() => boardView.render(boardPickup.state));
 
     gameState.board = boardPickup;
-    const nextPlayer = (player + 1) % 2;
-    activatePlayer(nextPlayer);
+    gameState.player = (player + 1) % 2;
+    activatePlayer(gameState.player);
 
-    if (!gameState.board.canMove(nextPlayer)) {
+    if (!gameState.board.canMove(gameState.player)) {
         const p0Score = gameState.board.playerScore(0);
         const p1Score = gameState.board.playerScore(1);
         if (p0Score > p1Score) {
@@ -207,6 +207,10 @@ function makeMove(player, slotIdx) {
 
 boardView.houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
+        if (gameState.player !== 0) {
+            return;
+        }
+
         console.log('click', slotIdx);
         db.collection('games').doc(gameId).collection('moves').add({
             'uid': firebase.auth().currentUser.uid,
