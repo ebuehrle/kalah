@@ -8,9 +8,10 @@ const houses = Array.from(document.querySelectorAll('.house'));
 const stores = Array.from(document.querySelectorAll('.store'));
 
 const p0Name = document.querySelector('.player0');
+const signInStatus = document.querySelector('.sign-in .status');
 const p1Name = document.querySelector('.player1');
+const challengeStatus = document.querySelector('.challenge .status');
 const messageText = document.querySelector('.message');
-const refreshButton = document.querySelector('button.refresh');
 
 realStones.forEach(s => s.classList.add([
     'red', 'green', 'yellow',
@@ -42,63 +43,91 @@ firebase.auth().signInAnonymously()
     .then(() => { db = firebase.firestore() })
     .then(() => db.collection('users').doc(firebase.auth().currentUser.uid).get())
     .then(userDocSnapshot => {
-        username = userDocSnapshot.get('username') || 'Player 0';
-        seekUsername = userDocSnapshot.get('seek-username') || 'Player 1';
-        p0Name.value = username;
+        username = userDocSnapshot.get('username') || null;
+        seekUsername = userDocSnapshot.get('seek-username') || null;
+        setUsername(username);
         p1Name.value = seekUsername;
+        userDocSnapshot.ref.update({
+            'seek-username': firebase.firestore.FieldValue.delete(),
+            'game-id': firebase.firestore.FieldValue.delete(),
+        });
     })
-    .then(() => db.collection('users').doc(firebase.auth().currentUser.uid).set({
-        'username': username,
-    }))
     .then(() => attachListeners())
     .catch(e => console.error('Error signing in: ', e));
 
+function setUsername(name) {
+    if (!name) {
+        return;
+    }
+
+    if (name === username) {
+        signInStatus.innerHTML = username ? 'done' : ''; 
+    }
+
+    if (name && name !== username) {
+        db.collection('users').doc(firebase.auth().currentUser.uid).set({
+            'username': username,
+        }, { merge: true })
+        .then(() => {
+            signInStatus.innerHTML = username ? 'done' : ''; 
+        })
+        .catch(e => {
+            signInStatus.innerHTML = '';
+            console.error('Could not set username: ', e);
+        });
+    }
+
+    username = name;
+    p0Name.value = username;
+}
+
+function setSeekUsername(name) {
+    let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
+    userDocRef.update({
+        'seek-username': name,
+    })
+    .then(() => { challengeStatus.innerHTML = 'done'; })
+    .catch(e => { 
+        challengeStatus.innerHTML = '';
+        console.error('Could not register challenge: ', e);
+    })
+    .then(() => db.collection('users')
+        .where('username', '==', name)
+        .where('seek-username', '==', username)
+        .limit(1).get()
+    )
+    .then(opponentQuerySnapshot => {
+        if (opponentQuerySnapshot.empty) {
+            throw 'No matching opponent online.';
+        }
+        opponentQuerySnapshot.forEach(opponentQueryDocRef => {
+            db.collection('games').add({ 
+                'player0': firebase.auth().currentUser.uid,
+                'player1': opponentQueryDocRef.id,
+            })
+            .then(newGameDocRef => {
+                userDocRef.update({ 
+                    'game-id': newGameDocRef.id,
+                    'seek-username': firebase.firestore.FieldValue.delete(),
+                });
+                opponentQueryDocRef.ref.update({
+                    'game-id': newGameDocRef.id,
+                    'seek-username': firebase.firestore.FieldValue.delete(),
+                });
+            })
+            .then(() => console.log('Game created successfully.'));
+        });
+    })
+    .catch(e => console.error('Could not search for opponent: ', e));
+}
+
 function attachListeners() {
     document.querySelector('.sign-in').addEventListener('click', () => {
-        username = p0Name.value;
-        db.collection('users').doc(firebase.auth().currentUser.uid).update({
-            'username': username,
-        })
-        .then(() => console.log('Username set successfully to ', username))
-        .catch(e => console.error('Could not set username: ', e));
+        setUsername(p0Name.value);
     });
 
     document.querySelector('.challenge').addEventListener('click', () => {
-        seekUsername = p1Name.value;
-        let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
-        userDocRef.update({
-            "seek-username": seekUsername,
-        })
-        .then(() => console.log('Challenge registered successfully for ', seekUsername))
-        .catch(e => console.error('Could not register challenge: ', e))
-        .then(() => db.collection('users')
-            .where('username', '==', seekUsername)
-            .where('seek-username', '==', username)
-            .limit(1).get()
-        )
-        .then(opponentQuerySnapshot => {
-            if (opponentQuerySnapshot.empty) {
-                throw 'No matching opponent online.';
-            }
-            opponentQuerySnapshot.forEach(opponentQueryDocRef => {
-                db.collection('games').add({ 
-                    'player0': firebase.auth().currentUser.uid,
-                    'player1': opponentQueryDocRef.id,
-                })
-                .then(newGameDocRef => {
-                    userDocRef.update({ 
-                        'game-id': newGameDocRef.id,
-                        'seek-username': firebase.firestore.FieldValue.delete(),
-                    });
-                    opponentQueryDocRef.ref.update({
-                        'game-id': newGameDocRef.id,
-                        'seek-username': firebase.firestore.FieldValue.delete(),
-                    });
-                })
-                .then(() => console.log('Game created successfully.'));
-            });
-        })
-        .catch(e => console.error('Could not search for opponent: ', e));
+        setSeekUsername(p1Name.value);
     });
 
     db.collection('users').doc(firebase.auth().currentUser.uid).onSnapshot(doc => {
@@ -120,7 +149,7 @@ boardView.render(gameState.board.state);
 
 function setupGame(newGameId) {
     gameId = newGameId;
-    alert(`${seekUsername} has accepted your challenge.`);
+    challengeStatus.innerHTML = 'done_all';
 
     gameState = {
         board: new Board(),

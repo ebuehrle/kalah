@@ -60,9 +60,17 @@ main {
     text-shadow: inherit;
 }
 
-.player-names button.sign-in,
-.player-names button.challenge,
-.message .refresh {
+.player-name::placeholder {
+    color: inherit;
+    font-style: italic;
+    font-size: 0.75em;
+    opacity: 0.5;
+}
+
+.player-names button {
+    display: flex;
+    align-items: center;
+
     padding: 1em;
     color: inherit;
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -73,8 +81,7 @@ main {
     cursor: pointer;
 }
 
-.player-names button.sign-in:hover,
-.player-names button.challenge:hover,
+.player-names button:hover,
 .message .refresh:hover {
     box-shadow: 2px 2px 20px rgba(41, 44, 51, 0.5);
     background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
@@ -89,6 +96,11 @@ main {
 .player-names button.challenge {
     margin-right: 20px;
     margin-left: auto;
+}
+
+button .status{
+    margin-left: 0.75em;
+    font-size: 1.5em;
 }
 
 .player1 {
