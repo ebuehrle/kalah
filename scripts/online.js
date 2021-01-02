@@ -31,12 +31,14 @@ firebase.auth().signInAnonymously()
     .then(() => db.collection('users').doc(firebase.auth().currentUser.uid).get())
     .then(userDocSnapshot => {
         username = userDocSnapshot.get('username') || null;
-        seekUsername = userDocSnapshot.get('seek-username') || null;
+        seekUsername = userDocSnapshot.get('last_seek_username') || null;
         setUsername(username);
         p1Name.value = seekUsername;
         userDocSnapshot.ref.update({
-            'seek-username': firebase.firestore.FieldValue.delete(),
-            'game-id': firebase.firestore.FieldValue.delete(),
+            'seek_username': firebase.firestore.FieldValue.delete(),
+        });
+        userDocSnapshot.ref.collection('games').doc('participating').update({
+            'game_id': firebase.firestore.FieldValue.delete(),
         });
     })
     .then(() => attachListeners())
@@ -76,7 +78,8 @@ function setSeekUsername(name) {
     seekUsername = name;
     let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
     userDocRef.update({
-        'seek-username': seekUsername,
+        'seek_username': seekUsername,
+        'last_seek_username': seekUsername,
     })
     .then(() => { challengeStatus.innerHTML = 'done'; })
     .catch(e => { 
@@ -85,7 +88,7 @@ function setSeekUsername(name) {
     })
     .then(() => db.collection('users')
         .where('username', '==', seekUsername)
-        .where('seek-username', '==', username)
+        .where('seek_username', '==', username)
         .limit(1).get()
     )
     .then(opponentQuerySnapshot => {
@@ -98,17 +101,16 @@ function setSeekUsername(name) {
                 'player1': opponentQueryDocRef.id,
             })
             .then(newGameDocRef =>
-                opponentQueryDocRef.ref.update({
-                    'game-id': newGameDocRef.id,
-                    'seek-username': firebase.firestore.FieldValue.delete(),
+                opponentQueryDocRef.ref.collection('games').doc('participating').set({
+                    'game_id': newGameDocRef.id,
                 })
-                .then(() => userDocRef.update({ 
-                    'game-id': newGameDocRef.id,
-                    'seek-username': firebase.firestore.FieldValue.delete(),
+                .then(() => userDocRef.collection('games').doc('participating').set({ 
+                    'game_id': newGameDocRef.id,
                 }))
             )
             .then(() => console.log('Game created successfully.'))
-        );
+            .catch(e => console.error('Found opponent but could not create game: ', e))
+        )
     })
     .catch(e => console.error('Could not search for opponent: ', e));
 
@@ -124,8 +126,8 @@ function attachListeners() {
         setSeekUsername(p1Name.value);
     });
 
-    db.collection('users').doc(firebase.auth().currentUser.uid).onSnapshot(doc => {
-        const newGameId = doc.get('game-id');
+    db.collection('users').doc(firebase.auth().currentUser.uid).collection('games').doc('participating').onSnapshot(doc => {
+        const newGameId = doc.get('game_id');
         if (newGameId) {
             setupGame(newGameId);
         }
@@ -144,6 +146,12 @@ boardView.update(Array(12).fill(0).concat([24, 24]));
 function setupGame(newGameId) {
     gameId = newGameId;
     challengeStatus.innerHTML = 'done_all';
+
+    db.collection('users').doc(firebase.auth().currentUser.uid).update({
+        'seek_username': firebase.firestore.FieldValue.delete(),
+    })
+    .then(() => console.log('seek_username successfully reset'))
+    .catch(e => console.error('Could not reset seek_username: ', e));
 
     db.collection('games').doc(gameId).get()
         .then(docSnapshot => {
