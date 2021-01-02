@@ -8,7 +8,7 @@ const signInStatus = document.querySelector('.sign-in .status');
 const challengeStatus = document.querySelector('.challenge .status');
 const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
 
-window.addEventListener('resize', () => boardView.render());
+window.addEventListener('resize', () => boardView.update());
 
 function activatePlayer(player) {
     boardView.activatePlayer(player);
@@ -139,7 +139,7 @@ let gameState = {
     board: new Kalaha(Array(12).fill(0).concat(24, 24)),
     player: undefined,
 };
-boardView.render(gameState.board.state);
+boardView.update(gameState.board.state);
 
 function setupGame(newGameId) {
     gameId = newGameId;
@@ -149,7 +149,7 @@ function setupGame(newGameId) {
         board: new Kalaha(),
         player: undefined,
     };
-    boardView.render(gameState.board.state);
+    boardView.update(gameState.board.state);
 
     db.collection('games').doc(gameId).get()
         .then(docSnapshot => {
@@ -186,7 +186,7 @@ function makeMove(player, slotIdx) {
     }
 
     const [boardDistribute, boardPickup] = moveResult;
-    boardView.render(boardDistribute.state).then(() => boardView.render(boardPickup.state));
+    boardView.update(boardDistribute.state).then(() => boardView.update(boardPickup.state));
 
     gameState.board = boardPickup;
     gameState.player = (player + 1) % 2;

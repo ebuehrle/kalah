@@ -7,7 +7,7 @@ const messageText = document.querySelector('.message');
 const refreshButton = document.querySelector('button.refresh');
 const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
 
-window.addEventListener('resize', () => boardView.render());
+window.addEventListener('resize', () => boardView.update());
 
 function activePlayer(player) {
     boardView.activatePlayer(player);
@@ -15,36 +15,25 @@ function activePlayer(player) {
     messageText.innerHTML = `${player ? p1Name() : p0Name()}, your turn.`
 }
 
-function resetGame(board=new Kalaha(), player=0) {
-    gameState = {
-        board: board,
-        player: player,
-    };
-    activePlayer(gameState.player);
-    boardView.render(gameState.board.state);
-}
+let game = new Kalaha(afterMove=((distribute, pickup, nextPlayer) => {
+    boardView.update(distribute).then(() => boardView.update(pickup));
+    history.pushState(game.state, document.title);
+    activePlayer(nextPlayer);
+}));
 
-resetGame();
-history.pushState(gameState, document.title);
+function resetGame() {
+    game.reset();
+    boardView.update(game.state.board);
+    history.pushState(game.state, document.title);
+    activePlayer(game.state.nextPlayer);
+}
 
 boardView.houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
-        const moveResult = gameState.board.move(slotIdx, gameState.player);
-        if (moveResult === null) {
-            return; // invalid move
-        }
-
-        const [boardDistribute, boardPickup] = moveResult;
-        boardView.render(boardDistribute.state).then(() => boardView.render(boardPickup.state));
-
-        gameState.board = boardPickup;
-        gameState.player = (gameState.player + 1) % 2;
-        history.pushState(gameState, document.title);
-        activePlayer(gameState.player);
-
-        if (!gameState.board.canMove(gameState.player)) {
-            const p0Score = gameState.board.playerScore(0);
-            const p1Score = gameState.board.playerScore(1);
+        game.move(slotIdx);
+        if (game.over()) {
+            const p0Score = game.playerScore(0);
+            const p1Score = game.playerScore(1);
             if (p0Score > p1Score) {
                 messageText.innerHTML = `${p0Name()} wins with ${p0Score} &mdash; ${p1Score}.`;
             } else if (p1Score > p0Score) {
@@ -58,9 +47,10 @@ boardView.houses.forEach((houseView, slotIdx) => {
 
 document.querySelector('button.refresh').addEventListener('click', () => {
     resetGame();
-    history.pushState(gameState, document.title);
 });
 
 window.addEventListener('popstate', ev => {
-    resetGame(Object.assign(new Kalaha, ev.state.board), ev.state.player);
+    game.reset(...ev.state);
 });
+
+resetGame();

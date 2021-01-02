@@ -83,7 +83,7 @@ class KalahaBoard {
         });
     }
 
-    render(boardState) {
+    update(boardState) {
         const animationTime = boardState ? this._transition(boardState) : 0;
 
         this._layout();
