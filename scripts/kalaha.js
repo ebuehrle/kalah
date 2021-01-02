@@ -2,19 +2,20 @@ class Kalaha {
 
     static get init64() { return [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0]; };
 
-    constructor(afterMove=() => {}, board=Kalaha.init64, nextPlayer=0) {
-        this.reset(board, nextPlayer);
+    constructor(afterMove=() => {}, state={ board: Kalaha.init64, nextPlayer: 0 }) {
+        this.reset(state);
         this.afterMove = afterMove;
     }
 
-    reset(board=Kalaha.init64, nextPlayer=0) {
-        this.state = {
-            board: board,
-            nextPlayer: nextPlayer,
-        };
+    reset(state={ board: Kalaha.init64, nextPlayer: 0 }) {
+        this.state = state;
     }
 
     move(house) {
+        if (!Kalaha.moveValid(this.state.board, this.state.nextPlayer, house)) {
+            return null;
+        }
+
         const moveResult = Kalaha.move(this.state.board, house);
         if (moveResult) {
             this.state.board = moveResult[1];
@@ -23,6 +24,8 @@ class Kalaha {
                 this.afterMove(...moveResult, this.state.nextPlayer);
             }
         }
+        
+        return moveResult;
     }
 
     over() {

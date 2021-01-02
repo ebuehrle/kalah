@@ -15,16 +15,15 @@ function activePlayer(player) {
     messageText.innerHTML = `${player ? p1Name() : p0Name()}, your turn.`
 }
 
-let game = new Kalaha(afterMove=((distribute, pickup, nextPlayer) => {
+let game = new Kalaha(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
     history.pushState(game.state, document.title);
     activePlayer(nextPlayer);
-}));
+});
 
-function resetGame() {
-    game.reset();
+function resetGame(state={ board: Kalaha.init64, nextPlayer: 0 }) {
+    game.reset(state);
     boardView.update(game.state.board);
-    history.pushState(game.state, document.title);
     activePlayer(game.state.nextPlayer);
 }
 
@@ -47,10 +46,12 @@ boardView.houses.forEach((houseView, slotIdx) => {
 
 document.querySelector('button.refresh').addEventListener('click', () => {
     resetGame();
+    history.pushState(game.state, document.title);
 });
 
 window.addEventListener('popstate', ev => {
-    game.reset(...ev.state);
+    resetGame(ev.state);
 });
 
 resetGame();
+history.pushState(game.state, document.title);

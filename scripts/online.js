@@ -10,7 +10,7 @@ const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
 
 window.addEventListener('resize', () => boardView.update());
 
-function activatePlayer(player) {
+function activePlayer(player) {
     boardView.activatePlayer(player);
     boardView.inactivatePlayer((player + 1) % 2);
     if (player === 0) {
@@ -40,7 +40,7 @@ firebase.auth().signInAnonymously()
         });
     })
     .then(() => attachListeners())
-    .catch(e => console.error('Error signing in: ', e));
+    .catch(e => console.warn('Error during sign-in: ', e));
 
 function setUsername(name) {
     if (!name) {
@@ -135,66 +135,48 @@ function attachListeners() {
 }
 
 let lastSeenMoveTimestamp = undefined;
-let gameState = {
-    board: new Kalaha(Array(12).fill(0).concat(24, 24)),
-    player: undefined,
-};
-boardView.update(gameState.board.state);
+let game = new Kalaha(afterMove=(distribute, pickup, nextPlayer) => {
+    boardView.update(distribute).then(() => boardView.update(pickup));
+    activePlayer(nextPlayer);
+});
+boardView.update(Array(12).fill(0).concat([24, 24]));
 
 function setupGame(newGameId) {
     gameId = newGameId;
     challengeStatus.innerHTML = 'done_all';
 
-    gameState = {
-        board: new Kalaha(),
-        player: undefined,
-    };
-    boardView.update(gameState.board.state);
-
     db.collection('games').doc(gameId).get()
         .then(docSnapshot => {
             const player0Uid = docSnapshot.get('player0');
             const isLocalPlayer = player0Uid === firebase.auth().currentUser.uid;
-            gameState.player = isLocalPlayer ? 0 : 1;
-            activatePlayer(gameState.player);
-        });
+            game.reset({ board: Kalaha.init64, nextPlayer: isLocalPlayer ? 0 : 1});
+            boardView.update(game.state.board);
+            activePlayer(game.state.nextPlayer);
+        })
+        .catch(e => console.error('Could not get game information: ', e));
 
     db.collection('games').doc(gameId)
         .collection('moves').orderBy('timestamp')
-        .onSnapshot(moveQuerySnapshot => moveQuerySnapshot.forEach(moveQueryDocSnapshot => {
-            const moveTimestamp = moveQueryDocSnapshot.get('timestamp');
-            if (moveTimestamp <= lastSeenMoveTimestamp) {
-                return;
+        .onSnapshot(moveQuerySnapshot => moveQuerySnapshot
+            .forEach(snap => {
+                const timestamp = snap.get('timestamp');
+                if (timestamp <= lastSeenMoveTimestamp) {
+                    return;
+                }
+                lastSeenMoveTimestamp = timestamp;
+                const playerUid = snap.get('uid');
+                const house = snap.get('house');
+                const isLocalPlayer = playerUid === firebase.auth().currentUser.uid;
+                makeMove(isLocalPlayer ? house : house + 6);
             }
-            lastSeenMoveTimestamp = moveTimestamp;
-
-            const playerUid = moveQueryDocSnapshot.get('uid');
-            const house = moveQueryDocSnapshot.get('house');
-            const isLocalPlayer = playerUid === firebase.auth().currentUser.uid;
-            makeMove(
-                isLocalPlayer ? 0 : 1,
-                isLocalPlayer ? house : house + 6
-            );
-        }));
+        ));
 }
 
-function makeMove(player, slotIdx) {
-    const moveResult = gameState.board.move(slotIdx, player);
-    if (moveResult === null) {
-        console.error('Received invalid move.', player, slotIdx);
-        return; // invalid move
-    }
-
-    const [boardDistribute, boardPickup] = moveResult;
-    boardView.update(boardDistribute.state).then(() => boardView.update(boardPickup.state));
-
-    gameState.board = boardPickup;
-    gameState.player = (player + 1) % 2;
-    activatePlayer(gameState.player);
-
-    if (!gameState.board.canMove(gameState.player)) {
-        const p0Score = gameState.board.playerScore(0);
-        const p1Score = gameState.board.playerScore(1);
+function makeMove(slotIdx) {
+    game.move(slotIdx);
+    if (game.over()) {
+        const p0Score = game.playerScore(0);
+        const p1Score = game.playerScore(1);
         if (p0Score > p1Score) {
             messageText.innerHTML = `${username} wins with ${p0Score} &mdash; ${p1Score}.`;
         } else if (p1Score > p0Score) {
@@ -207,7 +189,7 @@ function makeMove(player, slotIdx) {
 
 boardView.houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
-        if (gameState.player !== 0) {
+        if (!game.move(slotIdx)) {
             return;
         }
 
