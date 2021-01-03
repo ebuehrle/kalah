@@ -100,3 +100,13 @@ button:hover {
     background: linear-gradient(-45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06) 30%,
         rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03));
 }
+
+button span {
+    vertical-align: middle;
+}
+
+button i.material-icons {
+    margin-left: 0.75em;
+    font-size: 1.25em;
+    vertical-align: middle;
+}
