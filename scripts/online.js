@@ -113,6 +113,7 @@ function listen(game_id) {
         });
 
         if (uid0 && uid1) {
+            lastSeenMoveTimestamp = undefined;
             game.reset({ board: Kalah.init64, nextPlayer: isLocal(uid0) ? 0 : 1});
             boardView.update(game.state.board);
             players[game.state.nextPlayer].prompt();
