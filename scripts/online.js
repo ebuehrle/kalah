@@ -14,6 +14,24 @@ const messageText = document.querySelector('.message');
 boardView.update(Array(12).fill(0).concat([24, 24]));
 window.addEventListener('resize', () => boardView.update());
 
+let player0 = {
+    prompt: () => {
+        boardView.activatePlayer(0);
+        boardView.inactivatePlayer(1);
+        messageText.innerHTML = p0Name.value ? `${p0Name.value}, your turn.` : 'Your turn.';
+    }
+};
+
+let player1 = {
+    prompt: () => {
+        boardView.activatePlayer(1);
+        boardView.inactivatePlayer(0);
+        messageText.innerHTML = `Waiting for ${p1Name.innerHTML || 'opponent'}.`
+    }
+};
+
+let players = [player0, player1];
+
 let db = undefined;
 let gameid = undefined;
 let uid0 = undefined;
@@ -77,7 +95,7 @@ function join(game) {
 let lastSeenMoveTimestamp = undefined;
 let game = new Kalaha(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
-    activePlayer(nextPlayer);
+    players[nextPlayer].prompt();
 });
 
 function listen(game_id) {
@@ -97,7 +115,7 @@ function listen(game_id) {
         if (uid0 && uid1) {
             game.reset({ board: Kalaha.init64, nextPlayer: isLocal(uid0) ? 0 : 1});
             boardView.update(game.state.board);
-            activePlayer(game.state.nextPlayer);
+            players[game.state.nextPlayer].prompt();
         }
     });
 
@@ -127,16 +145,6 @@ function makeMove(slotIdx) {
         } else {
             messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
         }
-    }
-}
-
-function activePlayer(player) {
-    boardView.activatePlayer(player);
-    boardView.inactivatePlayer((player + 1) % 2);
-    if (player === 0) {
-        messageText.innerHTML = p0Name.value ? `${p0Name.value}, your turn.` : 'Your turn.';
-    } else {
-        messageText.innerHTML = `Waiting for ${p1Name.innerHTML || 'opponent'}.`
     }
 }
 

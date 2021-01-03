@@ -9,22 +9,34 @@ const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
 
 window.addEventListener('resize', () => boardView.update());
 
-function activePlayer(player) {
-    boardView.activatePlayer(player);
-    boardView.inactivatePlayer((player + 1) % 2);
-    messageText.innerHTML = `${player ? p1Name() : p0Name()}, your turn.`
-}
+let player0 = {
+    prompt: () => {
+        boardView.activatePlayer(0);
+        boardView.inactivatePlayer(1);
+        messageText.innerHTML = `${p0Name.value || 'Left'}, your turn.`;
+    }
+};
+
+let player1 = {
+    prompt: () => {
+        boardView.activatePlayer(1);
+        boardView.inactivatePlayer(0);
+        messageText.innerHTML = `${p1Name.value || 'Right'}, your turn.`;
+    }
+};
+
+let players = [player0, player1];
 
 let game = new Kalaha(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
     history.pushState(game.state, document.title);
-    activePlayer(nextPlayer);
+    players[nextPlayer].prompt();
 });
 
 function resetGame(state={ board: Kalaha.init64, nextPlayer: 0 }) {
     game.reset(state);
     boardView.update(game.state.board);
-    activePlayer(game.state.nextPlayer);
+    players[game.state.nextPlayer].prompt();
 }
 
 boardView.houses.forEach((houseView, slotIdx) => {
