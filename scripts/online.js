@@ -1,139 +1,77 @@
 // import { Kalaha } from './kalaha.js';
 // import { KalahaBoard } from './kalahaboard.js';
 
-const p0Name = document.querySelector('.player0');
-const p1Name = document.querySelector('.player1');
-const messageText = document.querySelector('.message');
-const signInStatus = document.querySelector('.sign-in .status');
-const challengeStatus = document.querySelector('.challenge .status');
-const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
+const inviteButton = document.querySelector('button.invite');
+const joinButton = document.querySelector('button.join');
+const gameidInput  = document.querySelector('input.gameid');
+const inviteEmail = document.querySelector('.invite--email');
+const p0Name = document.querySelector('.player-name.player0');
+const p1Name = document.querySelector('.player-name.player1');
 
+const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
+const messageText = document.querySelector('.message');
+
+boardView.update(Array(12).fill(0).concat([24, 24]));
 window.addEventListener('resize', () => boardView.update());
 
-function activePlayer(player) {
-    boardView.activatePlayer(player);
-    boardView.inactivatePlayer((player + 1) % 2);
-    if (player === 0) {
-        messageText.innerHTML = `${username}, your turn.`
-    } else {
-        messageText.innerHTML = `Waiting for ${seekUsername}.`
-    }
-}
-
-let username = null;
-let seekUsername = null;
-let gameId = null;
-let db = null;
+let db = undefined;
+let gameid = undefined;
+let uid0 = undefined;
+let uid1 = undefined;
+let isLocal = (uid) => firebase.auth().currentUser.uid === uid;
 
 firebase.auth().signInAnonymously()
     .then(() => console.log('Signed in anonymously.', firebase.auth().currentUser))
     .then(() => { db = firebase.firestore() })
-    .then(() => db.collection('users').doc(firebase.auth().currentUser.uid).get())
-    .then(userDocSnapshot => {
-        username = userDocSnapshot.get('username') || null;
-        seekUsername = userDocSnapshot.get('last_seek_username') || null;
-        setUsername(username);
-        p1Name.value = seekUsername;
-        userDocSnapshot.ref.update({
-            'seek_username': firebase.firestore.FieldValue.delete(),
-        });
-        userDocSnapshot.ref.collection('games').doc('participating').update({
-            'game_id': firebase.firestore.FieldValue.delete(),
-        });
-    })
     .then(() => attachListeners())
     .catch(e => console.warn('Error during sign-in: ', e));
 
-function setUsername(name) {
-    if (!name) {
-        return;
-    }
-
-    if (name === username) {
-        signInStatus.innerHTML = username ? 'done' : ''; 
-    }
-
-    if (name && name !== username) {
-        username = name;
-        db.collection('users').doc(firebase.auth().currentUser.uid).set({
-            'username': username,
-        }, { merge: true })
-        .then(() => {
-            signInStatus.innerHTML = username ? 'done' : ''; 
-        })
-        .catch(e => {
-            signInStatus.innerHTML = '';
-            console.error('Could not set username: ', e);
-        });
-    }
-
-    p0Name.value = username;
-}
-
-function setSeekUsername(name) {
-    if (!name) {
-        return;
-    }
-
-    seekUsername = name;
-    let userDocRef = db.collection('users').doc(firebase.auth().currentUser.uid);
-    userDocRef.update({
-        'seek_username': seekUsername,
-        'last_seek_username': seekUsername,
-    })
-    .then(() => { challengeStatus.innerHTML = 'done'; })
-    .catch(e => { 
-        challengeStatus.innerHTML = '';
-        console.error('Could not register challenge: ', e);
-    })
-    .then(() => db.collection('users')
-        .where('username', '==', seekUsername)
-        .where('seek_username', '==', username)
-        .limit(1).get()
-    )
-    .then(opponentQuerySnapshot => {
-        if (opponentQuerySnapshot.empty) {
-            throw 'No matching opponent online.';
-        }
-        opponentQuerySnapshot.forEach(opponentQueryDocRef =>
-            db.collection('games').add({ 
-                'player0': firebase.auth().currentUser.uid,
-                'player1': opponentQueryDocRef.id,
-            })
-            .then(newGameDocRef =>
-                opponentQueryDocRef.ref.collection('games').doc('participating').set({
-                    'game_id': newGameDocRef.id,
-                })
-                .then(() => userDocRef.collection('games').doc('participating').set({ 
-                    'game_id': newGameDocRef.id,
-                }))
-            )
-            .then(() => console.log('Game created successfully.'))
-            .catch(e => console.error('Found opponent but could not create game: ', e))
-        )
-    })
-    .catch(e => console.error('Could not search for opponent: ', e));
-
-    p1Name.value = seekUsername;
-}
-
 function attachListeners() {
-    document.querySelector('.sign-in').addEventListener('click', () => {
-        setUsername(p0Name.value);
-    });
+    inviteButton.addEventListener('click', () => invite());
+    joinButton.addEventListener('click', () => join(gameidInput.value));
 
-    document.querySelector('.challenge').addEventListener('click', () => {
-        setSeekUsername(p1Name.value);
+    p0Name.addEventListener('change', e => {
+        db.collection('roomusers').doc(firebase.auth().currentUser.uid).set({
+            'name': e.target.value,
+        }, { merge: true })
+        .then(() => console.log('Name set successfully'))
+        .catch(e => console.error('Could not set name: ', e));
     });
-
-    db.collection('users').doc(firebase.auth().currentUser.uid).collection('games').doc('participating').onSnapshot(doc => {
-        const newGameId = doc.get('game_id');
-        if (newGameId) {
-            setupGame(newGameId);
-        }
+    db.collection('roomusers').doc(firebase.auth().currentUser.uid).onSnapshot(snap => {
+        p0Name.value = snap.get('name') || null;
     });
-
+    
     console.log('listeners attached');
+}
+
+function invite() {
+    db.collection('rooms').add({
+        'created': firebase.firestore.FieldValue.serverTimestamp(),
+        'uid0': firebase.auth().currentUser.uid,
+    })
+    .then(gameDocRef => {
+        console.log('Game created successfully');
+        listen(gameDocRef.id);
+    })
+    .catch(e => console.error('Could not create game: ', e));
+}
+
+function join(game) {
+    if (!game) {
+        gameidInput.focus();
+        return;
+    }
+    db.collection('rooms').doc(game).update({
+        'uid1': firebase.auth().currentUser.uid,
+        'name1': p0Name.value,
+    })
+    .then(() => {
+        listen(game);
+    })
+    .catch(e => {
+        gameidInput.focus();
+        console.error('Could not join game: ', e);
+    });
 }
 
 let lastSeenMoveTimestamp = undefined;
@@ -141,43 +79,40 @@ let game = new Kalaha(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
     activePlayer(nextPlayer);
 });
-boardView.update(Array(12).fill(0).concat([24, 24]));
 
-function setupGame(newGameId) {
-    gameId = newGameId;
-    challengeStatus.innerHTML = 'done_all';
+function listen(game_id) {
+    gameid = game_id;
+    gameidInput.value = gameid;
+    inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}, using the Game ID ${gameid}.&subject=Fancy a game of Kalah?`;
 
-    db.collection('users').doc(firebase.auth().currentUser.uid).update({
-        'seek_username': firebase.firestore.FieldValue.delete(),
-    })
-    .then(() => console.log('seek_username successfully reset'))
-    .catch(e => console.error('Could not reset seek_username: ', e));
+    db.collection('rooms').doc(gameid).onSnapshot(snap => {
+        uid0 = snap.get('uid0');
+        uid1 = snap.get('uid1');
 
-    db.collection('games').doc(gameId).get()
-        .then(docSnapshot => {
-            const player0Uid = docSnapshot.get('player0');
-            const isLocalPlayer = player0Uid === firebase.auth().currentUser.uid;
-            game.reset({ board: Kalaha.init64, nextPlayer: isLocalPlayer ? 0 : 1});
+        const opponentuid = isLocal(uid0) ? uid1 : uid0;
+        db.collection('roomusers').doc(opponentuid).onSnapshot(snap => {
+            p1Name.innerHTML = snap.get('name') || null;
+        });
+
+        if (uid0 && uid1) {
+            game.reset({ board: Kalaha.init64, nextPlayer: isLocal(uid0) ? 0 : 1});
             boardView.update(game.state.board);
             activePlayer(game.state.nextPlayer);
-        })
-        .catch(e => console.error('Could not get game information: ', e));
+        }
+    });
 
-    db.collection('games').doc(gameId)
-        .collection('moves').orderBy('timestamp')
-        .onSnapshot(moveQuerySnapshot => moveQuerySnapshot
-            .forEach(snap => {
-                const timestamp = snap.get('timestamp');
-                if (timestamp <= lastSeenMoveTimestamp) {
-                    return;
-                }
-                lastSeenMoveTimestamp = timestamp;
-                const playerUid = snap.get('uid');
-                const house = snap.get('house');
-                const isLocalPlayer = playerUid === firebase.auth().currentUser.uid;
-                makeMove(isLocalPlayer ? house : house + 6);
+    db.collection('rooms').doc(gameid).collection('moves')
+    .orderBy('timestamp').onSnapshot(query =>
+        query.forEach(snap => {
+            const timestamp = snap.get('timestamp');
+            if (timestamp <= lastSeenMoveTimestamp) {
+                return;
             }
-        ));
+            lastSeenMoveTimestamp = timestamp;
+            const house = snap.get('house');
+            makeMove(isLocal(snap.get('uid')) ? house : house + 6);
+        })
+    );
 }
 
 function makeMove(slotIdx) {
@@ -186,12 +121,22 @@ function makeMove(slotIdx) {
         const p0Score = game.playerScore(0);
         const p1Score = game.playerScore(1);
         if (p0Score > p1Score) {
-            messageText.innerHTML = `${username} wins with ${p0Score} &mdash; ${p1Score}.`;
+            messageText.innerHTML = `${p0Name.value} wins with ${p0Score} &mdash; ${p1Score}.`;
         } else if (p1Score > p0Score) {
-            messageText.innerHTML = `${seekUsername} wins with ${p1Score} &mdash; ${p0Score}.`;
+            messageText.innerHTML = `${p1Name.innerHTML} wins with ${p1Score} &mdash; ${p0Score}.`;
         } else {
             messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
         }
+    }
+}
+
+function activePlayer(player) {
+    boardView.activatePlayer(player);
+    boardView.inactivatePlayer((player + 1) % 2);
+    if (player === 0) {
+        messageText.innerHTML = p0Name.value ? `${p0Name.value}, your turn.` : 'Your turn.';
+    } else {
+        messageText.innerHTML = `Waiting for ${p1Name.innerHTML || 'opponent'}.`
     }
 }
 
@@ -202,12 +147,12 @@ boardView.houses.forEach((houseView, slotIdx) => {
         }
 
         console.log('click', slotIdx);
-        db.collection('games').doc(gameId).collection('moves').add({
+        db.collection('rooms').doc(gameid).collection('moves').add({
             'uid': firebase.auth().currentUser.uid,
             'house': slotIdx,
             'timestamp': firebase.firestore.FieldValue.serverTimestamp(),
         })
-        .then(() => console.log('Move added successfully.'))
-        .catch(e => console.error('Could not add move: ', e));
+        .then(() => console.log('Move sent successfully.'))
+        .catch(e => console.error('Could not send move: ', e));
     });
 });

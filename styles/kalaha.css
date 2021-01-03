@@ -51,17 +51,12 @@ a img {
     vertical-align: middle;
 }
 
-input[type=text] {
-    /* This is what I want: */
-    /* width: 23.8%; */
-    /* padding: 0.25em 1em; */
-
-    /* Trying hard to avoid clipped text shadows
-     * without looking too awkward. */
-    width: 14.8%;
-    text-align: center;
+input[type=text],
+.player-name {
+    /*padding: 0.25em 1em;*/
+    padding: 0 1em;
     line-height: 1.5em;
-
+    
     font-size: 1.5em;
     background: transparent;
     border: none;
@@ -70,6 +65,17 @@ input[type=text] {
     font-family: inherit;
     font-weight: inherit;
     text-shadow: inherit;
+}
+
+.player-name {
+    /* This is what I want: */
+    /* width: 23.8%; */
+    /* padding: 0.25em 1em; */
+
+    /* Trying hard to avoid clipped text shadows
+     * without looking too awkward. */
+    width: 14.8%;
+    text-align: center;
 }
 
 input[type=text]::placeholder {

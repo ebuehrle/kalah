@@ -30,16 +30,19 @@
                     <option value='#'>Online Game</option></a>
                     <option value='index.html'>Local Game</option>
                 </select>
-                <a target='n' href='https://github.com/ebuehrle/kalaha'><img src='res/GitHub-Mark-Light-32px.png'/></a>
+                <a href='https://github.com/ebuehrle/kalaha'><img src='res/GitHub-Mark-Light-32px.png'/></a>
             </nav>        
         </header>
         <main>
+            <header class='room-controls'>
+                <button class='invite'>Invite</button>
+                <button class='join'>Join</button>
+                <input type='text' class='gameid' placeholder='Enter Game ID'/>
+                <a href='#' class='material-icons invite--share invite--email'>email</a>
+            </header>
             <div class='player-names'>
                 <input type='text' class='player-name player0' placeholder='Pick a name...'/>
-                <button class='sign-in'><span>Sign In</span><i class='status material-icons'></i></button>
-                <div class='spacer'></div>
-                <button class='challenge'><span>Challenge</span><i class='status material-icons'></i></button>
-                <input type='text' class='player-name player1' placeholder='Challenge someone...'/>
+                <span class='player-name player1'></span>
             </div>
             <div class='board-wrapper'></div>
             <div class='center message'></div>

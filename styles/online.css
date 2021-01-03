@@ -1,9 +1,30 @@
-.sign-in {
-    margin-left: 20px;
+h1 {
+    margin-bottom: 0;
 }
 
-.challenge {
-    margin-right: 20px;
+.room-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+a,
+a:active,
+a:visited {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+.room-controls a.material-icons {
+    text-shadow: none;
+    cursor: pointer;
+    transition: text-shadow 0.1s ease;
+}
+
+.room-controls a.material-icons:hover {
+    text-shadow: inherit;
 }
 
 .store0.active,
