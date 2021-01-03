@@ -66,4 +66,4 @@ window.addEventListener('popstate', ev => {
 });
 
 resetGame();
-history.pushState(game.state, document.title);
+history.replaceState(game.state, document.title);
