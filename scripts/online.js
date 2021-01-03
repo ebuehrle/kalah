@@ -139,11 +139,11 @@ function makeMove(slotIdx) {
         const p0Score = game.playerScore(0);
         const p1Score = game.playerScore(1);
         if (p0Score > p1Score) {
-            messageText.innerHTML = `${p0Name.value} wins with ${p0Score} &mdash; ${p1Score}.`;
+            messageText.innerHTML = `You win with ${p0Score} &mdash; ${p1Score}.`;
         } else if (p1Score > p0Score) {
-            messageText.innerHTML = `${p1Name.innerHTML} wins with ${p1Score} &mdash; ${p0Score}.`;
+            messageText.innerHTML = `Your opponent wins with ${p1Score} &mdash; ${p0Score}.`;
         } else {
-            messageText.innerHTML = `The game is drawn at ${p0Score} each! Another one?`;
+            messageText.innerHTML = `The game is drawn at ${p0Score} each! Invite to another one?`;
         }
     }
 }

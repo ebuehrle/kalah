@@ -13,7 +13,7 @@ let player0 = {
     prompt: () => {
         boardView.activatePlayer(0);
         boardView.inactivatePlayer(1);
-        messageText.innerHTML = `${p0Name.value || 'Left'}, your turn.`;
+        messageText.innerHTML = `${p0Name()}, your turn.`;
     }
 };
 
@@ -21,7 +21,7 @@ let player1 = {
     prompt: () => {
         boardView.activatePlayer(1);
         boardView.inactivatePlayer(0);
-        messageText.innerHTML = `${p1Name.value || 'Right'}, your turn.`;
+        messageText.innerHTML = `${p1Name()}, your turn.`;
     }
 };
 
