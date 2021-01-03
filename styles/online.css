@@ -16,8 +16,8 @@ a:visited {
     color: inherit;
 }
 
-
 .room-controls a.material-icons {
+    vertical-align: middle;
     text-shadow: none;
     cursor: pointer;
     transition: text-shadow 0.1s ease;
@@ -25,6 +25,11 @@ a:visited {
 
 .room-controls a.material-icons:hover {
     text-shadow: inherit;
+}
+
+.gameid {
+    width: 15em;
+    text-align: center;
 }
 
 .store0.active,

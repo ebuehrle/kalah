@@ -1,10 +1,51 @@
 // import { Kalah } from './kalah.js';
 // import { KalahBoard } from './kalahboard.js';
 
-const inviteButton = document.querySelector('button.invite');
-const joinButton = document.querySelector('button.join');
-const gameidInput  = document.querySelector('input.gameid');
-const inviteEmail = document.querySelector('.invite--email');
+class RoomControls  {
+    constructor() {
+        this.inviteButton = document.querySelector('.room-controls button.invite');
+        this.joinButton = document.querySelector('.room-controls button.join');
+        this.gameidInput = document.querySelector('.room-controls input.gameid');
+        this.inviteShareGroup = document.querySelector('.room-controls .invite--share');
+        this.inviteEmail = document.querySelector('.room-controls .invite--email');
+        this.cancelButton = document.querySelector('.room-controls .cancel');
+    }
+    reset() {
+        this.inviteButton.style.display = 'block';
+        this.joinButton.style.display = 'block';
+        this.gameidInput.style.display = 'none';
+        this.inviteShareGroup.style.display = 'none';
+        this.cancelButton.style.display = 'none';
+    }
+    join() {
+        this.inviteButton.style.display = 'none';
+        this.joinButton.style.display = 'none';
+        this.gameidInput.style.display = 'block';
+        this.gameidInput.disabled = false;
+        this.inviteShareGroup.style.display = 'none';
+        this.cancelButton.style.display = 'block';
+    }
+    invite() {
+        this.inviteButton.style.display = 'none';
+        this.joinButton.style.display = 'none';
+        this.gameidInput.style.display = 'block';
+        this.gameidInput.disabled = true;
+        this.inviteShareGroup.style.display = 'block';
+        this.cancelButton.style.display = 'block';
+    }
+    game() {
+        this.inviteButton.style.display = 'none';
+        this.joinButton.style.display = 'none';
+        this.gameidInput.style.display = 'block';
+        this.gameidInput.disabled = true;
+        this.inviteShareGroup.style.display = 'none';
+        this.cancelButton.style.display = 'block';
+    }
+};
+const roomControls = new RoomControls();
+roomControls.cancelButton.addEventListener('click', () => roomControls.reset());
+roomControls.reset();
+
 const p0Name = document.querySelector('.player-name.player0');
 const p1Name = document.querySelector('.player-name.player1');
 
@@ -45,8 +86,9 @@ firebase.auth().signInAnonymously()
     .catch(e => console.warn('Error during sign-in: ', e));
 
 function attachListeners() {
-    inviteButton.addEventListener('click', () => invite());
-    joinButton.addEventListener('click', () => join(gameidInput.value));
+    roomControls.inviteButton.addEventListener('click', () => invite());
+    roomControls.joinButton.addEventListener('click', () => roomControls.join());
+    roomControls.gameidInput.addEventListener('change', () => join(roomControls.gameidInput.value));
 
     p0Name.addEventListener('change', e => {
         db.collection('roomusers').doc(firebase.auth().currentUser.uid).set({
@@ -70,15 +112,13 @@ function invite() {
     .then(gameDocRef => {
         console.log('Game created successfully');
         listen(gameDocRef.id);
+        roomControls.invite();
     })
     .catch(e => console.error('Could not create game: ', e));
 }
 
 function join(game) {
-    if (!game) {
-        gameidInput.focus();
-        return;
-    }
+    roomControls.join();
     db.collection('rooms').doc(game).update({
         'uid1': firebase.auth().currentUser.uid,
         'name1': p0Name.value,
@@ -87,7 +127,7 @@ function join(game) {
         listen(game);
     })
     .catch(e => {
-        gameidInput.focus();
+        roomControls.gameidInput.focus();
         console.error('Could not join game: ', e);
     });
 }
@@ -100,8 +140,8 @@ let game = new Kalah(afterMove=(distribute, pickup, nextPlayer) => {
 
 function listen(game_id) {
     gameid = game_id;
-    gameidInput.value = gameid;
-    inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}, using the Game ID ${gameid}.&subject=Fancy a game of Kalah?`;
+    roomControls.gameidInput.value = gameid;
+    roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}, using the Game ID ${gameid}.&subject=Fancy a game of Kalah?`;
 
     db.collection('rooms').doc(gameid).onSnapshot(snap => {
         uid0 = snap.get('uid0');
@@ -113,6 +153,7 @@ function listen(game_id) {
         });
 
         if (uid0 && uid1) {
+            roomControls.game();
             lastSeenMoveTimestamp = undefined;
             game.reset({ board: Kalah.init64, nextPlayer: isLocal(uid0) ? 0 : 1});
             boardView.update(game.state.board);
