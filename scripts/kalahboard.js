@@ -1,4 +1,4 @@
-class KalahaBoard {
+class KalahBoard {
     constructor(wrapper, boardState=Array(12).fill(4).concat([0, 0])) {
         const stones = boardState.reduce((p, c) => p + c, 0);
 
@@ -147,4 +147,4 @@ class StoneView {
     }
 }
 
-// export { KalahaBoard };
+// export { KalahBoard };

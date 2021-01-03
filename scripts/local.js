@@ -1,11 +1,11 @@
-// import { Kalaha } from './kalaha.js';
-// import { KalahaBoard } from './kalahaboard.js';
+// import { Kalah } from './kalah.js';
+// import { KalahBoard } from './kalahboard.js';
 
 let p0Name = () => (document.querySelector('.player0').value || 'Left');
 let p1Name = () => (document.querySelector('.player1').value || 'Right');
 const messageText = document.querySelector('.message');
 const refreshButton = document.querySelector('button.refresh');
-const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
+const boardView = new KalahBoard(document.querySelector('.board-wrapper'));
 
 window.addEventListener('resize', () => boardView.update());
 
@@ -27,13 +27,13 @@ let player1 = {
 
 let players = [player0, player1];
 
-let game = new Kalaha(afterMove=(distribute, pickup, nextPlayer) => {
+let game = new Kalah(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
     history.pushState(game.state, document.title);
     players[nextPlayer].prompt();
 });
 
-function resetGame(state={ board: Kalaha.init64, nextPlayer: 0 }) {
+function resetGame(state={ board: Kalah.init64, nextPlayer: 0 }) {
     game.reset(state);
     boardView.update(game.state.board);
     players[game.state.nextPlayer].prompt();

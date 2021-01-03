@@ -1,22 +1,22 @@
-class Kalaha {
+class Kalah {
 
     static get init64() { return [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0]; };
 
-    constructor(afterMove=() => {}, state={ board: Kalaha.init64, nextPlayer: 0 }) {
+    constructor(afterMove=() => {}, state={ board: Kalah.init64, nextPlayer: 0 }) {
         this.reset(state);
         this.afterMove = afterMove;
     }
 
-    reset(state={ board: Kalaha.init64, nextPlayer: 0 }) {
+    reset(state={ board: Kalah.init64, nextPlayer: 0 }) {
         this.state = state;
     }
 
     move(house) {
-        if (!Kalaha.moveValid(this.state.board, this.state.nextPlayer, house)) {
+        if (!Kalah.moveValid(this.state.board, this.state.nextPlayer, house)) {
             return null;
         }
 
-        const moveResult = Kalaha.move(this.state.board, house);
+        const moveResult = Kalah.move(this.state.board, house);
         if (moveResult) {
             this.state.board = moveResult[1];
             this.state.nextPlayer = (this.state.nextPlayer + 1) % 2;
@@ -29,18 +29,18 @@ class Kalaha {
     }
 
     over() {
-        return !Kalaha.canMove(this.state.board, this.state.nextPlayer);
+        return !Kalah.canMove(this.state.board, this.state.nextPlayer);
     }
 
     playerScore(player) {
-        return Kalaha.playerScore(this.state.board, player);
+        return Kalah.playerScore(this.state.board, player);
     }
 
     static move(state, house) {
         let player;
-        if (Kalaha.moveValid(state, 0, house)) {
+        if (Kalah.moveValid(state, 0, house)) {
             player = 0;
-        } else if (Kalaha.moveValid(state, 1, house)) {
+        } else if (Kalah.moveValid(state, 1, house)) {
             player = 1;
         } else {
             return null; // invalid move
@@ -91,7 +91,7 @@ class Kalaha {
     
     static canMove(state, player) {
         for (let house = 0; house < 12; house++) {
-            if (Kalaha.moveValid(state, player, house)) {
+            if (Kalah.moveValid(state, player, house)) {
                 return true;
             }
         }
@@ -104,4 +104,4 @@ class Kalaha {
     
 }
 
-// export { Kalaha };
+// export { Kalah };

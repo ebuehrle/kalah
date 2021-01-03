@@ -1,5 +1,5 @@
-// import { Kalaha } from './kalaha.js';
-// import { KalahaBoard } from './kalahaboard.js';
+// import { Kalah } from './kalah.js';
+// import { KalahBoard } from './kalahboard.js';
 
 const inviteButton = document.querySelector('button.invite');
 const joinButton = document.querySelector('button.join');
@@ -8,7 +8,7 @@ const inviteEmail = document.querySelector('.invite--email');
 const p0Name = document.querySelector('.player-name.player0');
 const p1Name = document.querySelector('.player-name.player1');
 
-const boardView = new KalahaBoard(document.querySelector('.board-wrapper'));
+const boardView = new KalahBoard(document.querySelector('.board-wrapper'));
 const messageText = document.querySelector('.message');
 
 boardView.update(Array(12).fill(0).concat([24, 24]));
@@ -93,7 +93,7 @@ function join(game) {
 }
 
 let lastSeenMoveTimestamp = undefined;
-let game = new Kalaha(afterMove=(distribute, pickup, nextPlayer) => {
+let game = new Kalah(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
     players[nextPlayer].prompt();
 });
@@ -113,7 +113,7 @@ function listen(game_id) {
         });
 
         if (uid0 && uid1) {
-            game.reset({ board: Kalaha.init64, nextPlayer: isLocal(uid0) ? 0 : 1});
+            game.reset({ board: Kalah.init64, nextPlayer: isLocal(uid0) ? 0 : 1});
             boardView.update(game.state.board);
             players[game.state.nextPlayer].prompt();
         }
