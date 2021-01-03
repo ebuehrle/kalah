@@ -85,18 +85,22 @@ class KalahBoard {
 
     update(boardState) {
         const animationTime = boardState ? this._transition(boardState) : 0;
-
         this._layout();
-
         this.state.forEach(slot => {
             slot.forEach(stoneView => {
                 stoneView.update();
             });
         });
-
         return new Promise(resolve => {
-            setTimeout(() => resolve(animationTime), animationTime * 1000);
+            setTimeout(() => {
+                this.resetTransitionDelays();
+                resolve(animationTime)
+            }, animationTime * 1000);
         });
+    }
+
+    resetTransitionDelays() {
+        this.stoneViews.forEach(s => s.real.style.transitionDelay = '0');
     }
 
     playerStore(player) {
