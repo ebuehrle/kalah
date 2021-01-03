@@ -46,7 +46,12 @@ header h1 {
     justify-content: space-between;
 }
 
-.player-name {
+a img {
+    height: 1em;
+    vertical-align: middle;
+}
+
+input[type=text] {
     /* This is what I want: */
     /* width: 23.8%; */
     /* padding: 0.25em 1em; */
@@ -67,7 +72,7 @@ header h1 {
     text-shadow: inherit;
 }
 
-.player-name::placeholder {
+input[type=text]::placeholder {
     color: inherit;
     font-style: italic;
     font-size: 0.75em;
@@ -76,7 +81,9 @@ header h1 {
 }
 
 .center {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .message {
