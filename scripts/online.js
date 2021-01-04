@@ -97,6 +97,7 @@ function attachListeners() {
         .then(() => console.log('Name set successfully'))
         .catch(e => console.error('Could not set name: ', e));
     });
+
     db.collection('roomusers').doc(firebase.auth().currentUser.uid).onSnapshot(snap => {
         p0Name.value = snap.get('name') || null;
     });
@@ -137,20 +138,23 @@ let game = new Kalah(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
     players[nextPlayer].prompt();
 });
+let unsubscribers = []
 
 function listen(game_id) {
+    unsubscribers.splice(0, unsubscribers.length).forEach(unsub => unsub());
+
     gameid = game_id;
     roomControls.gameidInput.value = gameid;
     roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}, using the Game ID ${gameid}.&subject=Fancy a game of Kalah?`;
 
-    db.collection('rooms').doc(gameid).onSnapshot(snap => {
+    unsubscribers.push(db.collection('rooms').doc(gameid).onSnapshot(snap => {
         uid0 = snap.get('uid0');
         uid1 = snap.get('uid1');
 
         const opponentuid = isLocal(uid0) ? uid1 : uid0;
-        db.collection('roomusers').doc(opponentuid).onSnapshot(snap => {
+        unsubscribers.push(db.collection('roomusers').doc(opponentuid).onSnapshot(snap => {
             p1Name.innerHTML = snap.get('name') || null;
-        });
+        }));
 
         if (uid0 && uid1) {
             roomControls.game();
@@ -159,9 +163,9 @@ function listen(game_id) {
             boardView.update(game.state.board);
             players[game.state.nextPlayer].prompt();
         }
-    });
+    }));
 
-    db.collection('rooms').doc(gameid).collection('moves')
+    unsubscribers.push(db.collection('rooms').doc(gameid).collection('moves')
     .orderBy('timestamp').onSnapshot(query =>
         query.forEach(snap => {
             const timestamp = snap.get('timestamp');
@@ -172,7 +176,7 @@ function listen(game_id) {
             const house = snap.get('house');
             makeMove(isLocal(snap.get('uid')) ? house : house + 6);
         })
-    );
+    ));
 }
 
 function makeMove(slotIdx) {
