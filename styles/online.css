@@ -9,6 +9,10 @@ h1 {
     margin-bottom: 1em;
 }
 
+.room-controls .control {
+    margin: 5px;
+}
+
 a,
 a:active,
 a:visited {
