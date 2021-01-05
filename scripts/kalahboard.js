@@ -100,7 +100,8 @@ class KalahBoard {
     }
 
     resetTransitionDelays() {
-        this.stoneViews.forEach(s => s.real.style.transitionDelay = '0');
+        console.log('resetting transition delays');
+        this.stoneViews.forEach(s => s.real.style.transitionDelay = '0s');
     }
 
     playerStore(player) {
