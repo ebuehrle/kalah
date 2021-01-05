@@ -110,12 +110,13 @@ function attachListeners() {
 }
 
 function invite() {
-    return db.collection('rooms').add({
-        'created': firebase.firestore.FieldValue.serverTimestamp(),
-        'uid0': firebase.auth().currentUser.uid,
-    })
-    .then(gameDocRef => { console.log('Game created successfully.'); return gameDocRef; })
-    .catch(e => console.error('Could not create game: ', e));
+    let gameData = {};
+    gameData['created'] = firebase.firestore.FieldValue.serverTimestamp();
+    gameData[Math.random() < 0.5 ? 'uid0' : 'uid1'] = firebase.auth().currentUser.uid;
+    
+    return db.collection('rooms').add(gameData)
+        .then(gameDocRef => { console.log('Game created successfully.'); return gameDocRef; })
+        .catch(e => console.error('Could not create game: ', e));
 }
 
 function join(game) {
