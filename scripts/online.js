@@ -81,6 +81,12 @@ firebase.auth().signInAnonymously()
     .then(() => console.log('Signed in anonymously.', firebase.auth().currentUser))
     .then(() => { db = firebase.firestore() })
     .then(() => attachListeners())
+    .then(() => {
+        const urlGameId = new URLSearchParams(window.location.search).get('gameid');
+        if (urlGameId) {
+            return join(urlGameId);
+        }
+    })
     .catch(e => console.warn('Error during sign-in: ', e));
 
 function attachListeners() {
@@ -146,7 +152,7 @@ function join(game) {
 function waitForOpponent(game) {
     gameid = game;
     roomControls.gameidInput.value = gameid;
-    roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}, using the Game ID ${gameid}.&subject=Fancy a game of Kalah?`;
+    roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}?gameid=${gameid}, or using the Game ID ${gameid}.&subject=Fancy a game of Kalah?`;
     roomControls.invite();
 
     return new Promise((resolve, reject) => {
