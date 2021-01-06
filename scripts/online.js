@@ -192,8 +192,9 @@ function waitForOpponent(game) {
             }
         });
         roomControls.cancelButton.addEventListener('click', () => {
+            unsubscribe();
             reject('User cancelled while waiting for opponent.');
-        });
+        }, { once: true });
     });
 }
 
