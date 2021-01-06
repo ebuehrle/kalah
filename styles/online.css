@@ -13,6 +13,11 @@ h1 {
     margin: 5px;
 }
 
+.gameid {
+    width: 15em;
+    text-align: center;
+}
+
 a,
 a:active,
 a:visited {
@@ -31,9 +36,8 @@ a:visited {
     text-shadow: inherit;
 }
 
-.gameid {
-    width: 15em;
-    text-align: center;
+.followup.wiggle {
+    transform: rotate(15deg);
 }
 
 .store0.active,

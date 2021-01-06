@@ -9,6 +9,7 @@ class RoomControls  {
         this.inviteShareGroup = document.querySelector('.room-controls .invite--share');
         this.inviteEmail = document.querySelector('.room-controls .invite--email');
         this.cancelButton = document.querySelector('.room-controls .cancel');
+        this.followupButton = document.querySelector('.room-controls .followup');
     }
     reset() {
         this.inviteButton.style.display = 'block';
@@ -16,6 +17,7 @@ class RoomControls  {
         this.gameidInput.style.display = 'none';
         this.inviteShareGroup.style.display = 'none';
         this.cancelButton.style.display = 'none';
+        this.followupButton.style.display = 'none';
     }
     join() {
         this.inviteButton.style.display = 'none';
@@ -24,14 +26,19 @@ class RoomControls  {
         this.gameidInput.disabled = false;
         this.inviteShareGroup.style.display = 'none';
         this.cancelButton.style.display = 'block';
+        this.followupButton.style.display = 'none';
     }
-    invite() {
+    invite(game_id) {
+        roomControls.gameidInput.value = game_id;
+        roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}?gameid=${game_id}, or using the Game ID ${game_id}.&subject=Fancy a game of Kalah?`;
+        
         this.inviteButton.style.display = 'none';
         this.joinButton.style.display = 'none';
         this.gameidInput.style.display = 'block';
         this.gameidInput.disabled = true;
         this.inviteShareGroup.style.display = 'block';
         this.cancelButton.style.display = 'block';
+        this.followupButton.style.display = 'none';
     }
     game() {
         this.inviteButton.style.display = 'none';
@@ -40,6 +47,7 @@ class RoomControls  {
         this.gameidInput.disabled = true;
         this.inviteShareGroup.style.display = 'none';
         this.cancelButton.style.display = 'block';
+        this.followupButton.style.display = 'block';
     }
 };
 const roomControls = new RoomControls();
@@ -90,9 +98,21 @@ firebase.auth().signInAnonymously()
     .catch(e => console.warn('Error during sign-in: ', e));
 
 function attachListeners() {
-    roomControls.inviteButton.addEventListener('click', () => invite().then(gameDocRef => join(gameDocRef.id)));
+    roomControls.inviteButton.addEventListener('click', () => 
+        createGame()
+            .then(gameDocRef => join(gameDocRef.id))
+            .then(gameId => {
+                roomControls.invite(gameId);
+                return waitForOpponent(gameId);
+            })
+            .then(gameDocSnap => enterGame(gameDocSnap))
+    );
     roomControls.joinButton.addEventListener('click', () => roomControls.join());
-    roomControls.gameidInput.addEventListener('change', () => join(roomControls.gameidInput.value));
+    roomControls.gameidInput.addEventListener('change', () =>
+        join(roomControls.gameidInput.value)
+            .then(gameId => waitForOpponent(gameId))
+            .then(gameDocSnap => enterGame(gameDocSnap))
+    );
 
     p0Name.addEventListener('change', e => {
         db.collection('roomusers').doc(firebase.auth().currentUser.uid).set({
@@ -109,7 +129,7 @@ function attachListeners() {
     console.log('listeners attached');
 }
 
-function invite() {
+function createGame() {
     let gameData = {};
     gameData['created'] = firebase.firestore.FieldValue.serverTimestamp();
     gameData[Math.random() < 0.5 ? 'uid0' : 'uid1'] = firebase.auth().currentUser.uid;
@@ -120,30 +140,28 @@ function invite() {
 }
 
 function join(game) {
-    db.collection('rooms').doc(game).get().then(snap => {
+    return db.collection('rooms').doc(game).get().then(snap => {
         const uid0 = snap.get('uid0');
         const uid1 = snap.get('uid1');
         const uid = firebase.auth().currentUser.uid;
         if (uid0 == uid) {
             console.log('Already joined. I am player 0.');
-            return;
+            return game;
         } else if (uid1 == uid) {
-            console.log('Already joined. I am player 1');
-            return;  
+            console.log('Already joined. I am player 1.');
+            return game;  
         } else if (!uid0) {
             return snap.ref.update({
                 'uid0': firebase.auth().currentUser.uid,
-            });
+            }).then(() => game);
         } else if (!uid1) {
             return snap.ref.update({
                 'uid1': firebase.auth().currentUser.uid,
-            });
+            }).then(() => game);
         } else {
             throw 'Game already has two players.'
         }
     })
-    .then(() => waitForOpponent(game))
-    .then(gameSnap => enterGame(gameSnap))
     .catch(e => {
         roomControls.gameidInput.focus();
         console.error('Could not join game: ', e);
@@ -151,11 +169,6 @@ function join(game) {
 }
 
 function waitForOpponent(game) {
-    gameid = game;
-    roomControls.gameidInput.value = gameid;
-    roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}?gameid=${gameid}, or using the Game ID ${gameid}.&subject=Fancy a game of Kalah?`;
-    roomControls.invite();
-
     return new Promise((resolve, reject) => {
         let unsubscribe = db.collection('rooms').doc(game).onSnapshot(snap => {
             const uid0 = snap.get('uid0');
@@ -180,7 +193,7 @@ let unsubscribers = []
 
 function enterGame(gameDocSnap) {
     unsubscribers.splice(0, unsubscribers.length).forEach(unsub => unsub());
-
+    gameid = gameDocSnap.id;
     const uid0 = gameDocSnap.get('uid0');
     const uid1 = gameDocSnap.get('uid1');
 
