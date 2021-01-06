@@ -37,7 +37,7 @@ a:visited {
 }
 
 .followup.proposed {
-    transform: rotate(15deg);
+    transform: rotate(-45deg);
 }
 
 .store0.active,
