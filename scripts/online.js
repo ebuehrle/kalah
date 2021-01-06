@@ -209,6 +209,7 @@ let unsubscribers = []
 function enterGame(gameDocSnap) {
     unsubscribers.splice(0, unsubscribers.length).forEach(unsub => unsub());
     gameid = gameDocSnap.id;
+    roomControls.gameidInput.value = gameid;
     const uid0 = gameDocSnap.get('uid0');
     const uid1 = gameDocSnap.get('uid1');
 
