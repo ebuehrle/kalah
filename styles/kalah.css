@@ -85,6 +85,10 @@ input[type=text]::placeholder {
     line-height: 1.5em;
 }
 
+.board-wrapper {
+    height: 25em;
+}
+
 .center {
     display: flex;
     flex-direction: column;

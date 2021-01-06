@@ -1,11 +1,9 @@
 .board {
-    height: 400px;
-
+    height: 100%;
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(2, 1fr);
-
     position: relative;
 }
 
