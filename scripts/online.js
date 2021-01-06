@@ -201,7 +201,12 @@ function waitForOpponent(game) {
 let lastSeenMoveTimestamp = undefined;
 let followup = undefined;
 let game = new Kalah(afterMove=(distribute, pickup, nextPlayer) => {
-    boardView.update(distribute).then(() => boardView.update(pickup));
+    const mystamp = lastSeenMoveTimestamp;
+    boardView.update(distribute).then(() => {
+        if (lastSeenMoveTimestamp === mystamp) {
+            boardView.update(pickup)
+        }
+    });
     players[nextPlayer].prompt();
 });
 let unsubscribers = []
@@ -241,6 +246,7 @@ function enterGame(gameDocSnap) {
                 return;
             }
             lastSeenMoveTimestamp = timestamp;
+            
             const house = snap.get('house');
             makeMove(isLocal(snap.get('uid')) ? house : house + 6);
         })
@@ -253,9 +259,9 @@ function makeMove(slotIdx) {
         const p0Score = game.playerScore(0);
         const p1Score = game.playerScore(1);
         if (p0Score > p1Score) {
-            messageText.innerHTML = `You win with ${p0Score} &mdash; ${p1Score}.`;
+            messageText.innerHTML = (p0Name.value ? `${p0Name.value} wins` : 'You win') + ` with ${p0Score} &mdash; ${p1Score}.`;
         } else if (p1Score > p0Score) {
-            messageText.innerHTML = `Your opponent wins with ${p1Score} &mdash; ${p0Score}.`;
+            messageText.innerHTML = `${p1Name.innerHTML || 'Your opponent'} wins with ${p1Score} &mdash; ${p0Score}.`;
         } else {
             messageText.innerHTML = `The game is drawn at ${p0Score} each! Invite to another one?`;
         }
@@ -264,7 +270,7 @@ function makeMove(slotIdx) {
 
 boardView.houses.forEach((houseView, slotIdx) => {
     houseView.addEventListener('click', _ => {
-        if (!game.move(slotIdx)) {
+        if (!game.moveValid(slotIdx)) {
             return;
         }
 

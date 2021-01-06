@@ -11,8 +11,12 @@ class Kalah {
         this.state = state;
     }
 
+    moveValid(house) {
+        return Kalah.moveValid(this.state.board, this.state.nextPlayer, house);
+    }
+
     move(house) {
-        if (!Kalah.moveValid(this.state.board, this.state.nextPlayer, house)) {
+        if (!this.moveValid(house)) {
             return null;
         }
 
