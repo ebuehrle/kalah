@@ -30,7 +30,7 @@ class RoomControls  {
     }
     invite(game_id) {
         roomControls.gameidInput.value = game_id;
-        roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location}?gameid=${game_id}, or using the Game ID ${game_id}.&subject=Fancy a game of Kalah?`;
+        roomControls.inviteEmail.href = `mailto:?to=&body=Join me for a game of Kalah at ${window.location.href.split('?')[0]}?gameid=${game_id}, or using the Game ID ${game_id}.&subject=Fancy a game of Kalah?`;
         
         this.inviteButton.style.display = 'none';
         this.joinButton.style.display = 'none';
