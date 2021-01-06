@@ -92,7 +92,9 @@ firebase.auth().signInAnonymously()
     .then(() => {
         const urlGameId = new URLSearchParams(window.location.search).get('gameid');
         if (urlGameId) {
-            return join(urlGameId);
+            return join(urlGameId)
+                .then(() => waitForOpponent(urlGameId))
+                .then(gameDocSnap => enterGame(gameDocSnap));
         }
     })
     .catch(e => console.warn('Error during sign-in: ', e));
@@ -100,19 +102,30 @@ firebase.auth().signInAnonymously()
 function attachListeners() {
     roomControls.inviteButton.addEventListener('click', () => 
         createGame()
-            .then(gameDocRef => join(gameDocRef.id))
-            .then(gameId => {
-                roomControls.invite(gameId);
-                return waitForOpponent(gameId);
+            .then(gameDocRef => {
+                roomControls.invite(gameDocRef.id);
+                return waitForOpponent(gameDocRef.id);
             })
             .then(gameDocSnap => enterGame(gameDocSnap))
     );
     roomControls.joinButton.addEventListener('click', () => roomControls.join());
     roomControls.gameidInput.addEventListener('change', () =>
         join(roomControls.gameidInput.value)
-            .then(gameId => waitForOpponent(gameId))
+            .then(() => waitForOpponent(roomControls.gameidInput.value))
             .then(gameDocSnap => enterGame(gameDocSnap))
     );
+    roomControls.followupButton.addEventListener('click', () => {
+        if (followup) {
+            return join(followup)
+                .then(() => waitForOpponent(followup))
+                .then(gameDocSnap => enterGame(gameDocSnap));
+        } else {
+            return createGame()
+                .then(gameDocRef => db.collection('rooms').doc(gameid).update({ 'followup': gameDocRef.id }).then(() => gameDocRef))
+                .then(gameDocRef => waitForOpponent(gameDocRef.id))
+                .then(snap => enterGame(snap));
+        }
+    });
 
     p0Name.addEventListener('change', e => {
         db.collection('roomusers').doc(firebase.auth().currentUser.uid).set({
@@ -185,6 +198,7 @@ function waitForOpponent(game) {
 }
 
 let lastSeenMoveTimestamp = undefined;
+let followup = undefined;
 let game = new Kalah(afterMove=(distribute, pickup, nextPlayer) => {
     boardView.update(distribute).then(() => boardView.update(pickup));
     players[nextPlayer].prompt();
@@ -200,6 +214,15 @@ function enterGame(gameDocSnap) {
     const opponentuid = isLocal(uid0) ? uid1 : uid0;
     unsubscribers.push(db.collection('roomusers').doc(opponentuid).onSnapshot(snap => {
         p1Name.innerHTML = snap.get('name') || null;
+    }));
+
+    unsubscribers.push(gameDocSnap.ref.onSnapshot(snap => {
+        followup = snap.get('followup');
+        if (followup) {
+            roomControls.followupButton.classList.add('proposed');
+        } else {
+            roomControls.followupButton.classList.remove('proposed');
+        }
     }));
 
     roomControls.game();
